@@ -114,7 +114,7 @@ Eng yaqin muddatlar: **T-07 — 20.11 (ertaga!)**, **T-14 — 25.11**.
    - `.github/ISSUE_TEMPLATE/bug.yml` — "haqiqiy ma'lumot va parol yozmang" ogohlantirishi bilan;
    - `.gitignore`, `.editorconfig`, `.nvmrc` (`24`), `.gitattributes` (`* text=auto eol=lf`).
 3. Belgilar (labels): `gh auth status` bilan Diyorbek kirganini tekshir, keyin TZ'dagi ro'yxat bo'yicha `gh label create ...`.
-4. GitHub Settings (ruleset, Secret scanning, Push protection, Actions ruxsatlari) — faqat repo admini o'zgartiradi. Diyorbek Ilyosdan admin huquqini so'raydi yoki Ilyos o'zi qiladi. Sen aniq qadamlar ro'yxatini tayyorla: qaysi menyu, qaysi belgi.
+4. GitHub Settings'ni faqat Ilyos (repo egasi) o'zgartira oladi — shaxsiy akkaunt repo'sida hamkorga admin roli berilmaydi. 19.11 da yoqilgan: `main` ruleset'i (PR majburiy, 1 ta tasdiq, force-push va o'chirish taqiq), Secret scanning, Push protection, Dependabot alerts. Sen faqat tekshir: `gh api repos/suyunovdev/Dental/rules/branches/main` (`deletion`, `non_fast_forward`, `pull_request`) va repo sahifasidagi Security tabi. CI tayyor bo'lgach (T-14) — ruleset'ga status checks qo'shishni Ilyosga yozib berasan.
 5. PR → review: Ilyos.
 
 ### 6.2 T-14 — staging va CI (21–25.11)
