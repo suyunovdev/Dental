@@ -26,11 +26,12 @@ Siz jamoaning "xavfsizlik to'ri"siz: kod qanday yetkazilishi (CI/CD), qayerda is
 
 ## T-07 · GitHub repo, branch qoidalari, PR shabloni · 20.11
 
-> **Muhim:** repo yopiq va `suyunovdev` ning shaxsiy akkauntida. GitHub'ning bepul tarifida yopiq repoda `main`ni himoyalash, CODEOWNERS avto-review va environment'lar **ishlamaydi** (API 403 qaytaradi). Ilyos GitHub Pro olishi kerak (`arxitektura.md` 13.2). Sozlamalarni faqat repo egasi yoki admin o'zgartiradi — kerak bo'lsa Ilyosdan admin huquqini so'rang.
+> **Muhim:** repo **public** qilinadi (Ilyos qarori). Public repoda `main` himoyasi, CODEOWNERS, environment'lar va Actions bepul ishlaydi. Shu bilan birga hamma narsa — kod, issue, PR, Actions loglari — ochiq: qoidalar `arxitektura.md` 10.1-bo'limda. Sozlamalarni faqat repo egasi yoki admin o'zgartiradi — Ilyosdan admin huquqini so'rang.
 
 1. Hamma 6 kishi repoga kirganini tekshiring (taklifni qabul qilmaganlar bo'lsa — ularga yozing).
-2. **`main` himoyasi** (Pro bo'lgach, Settings → Rules): PR majburiy, kamida 1 ta tasdiq, CODEOWNERS review, CI (`backend`, `frontend`) yashil, branch `main`dan yangilangan, force-push va o'chirish taqiqlangan. Pro bo'lmaguncha: qoida og'zaki, siz har kuni `git log --first-parent main` ni ko'rib, PR'siz kelgan commit bo'lsa guruhga yozasiz.
-3. **`.github/pull_request_template.md`:**
+2. **`main` himoyasi** (Settings → Rules → Rulesets): PR majburiy, kamida 1 ta tasdiq, CODEOWNERS review, CI (`backend`, `frontend`) yashil, branch `main`dan yangilangan, force-push va o'chirish taqiqlangan.
+3. **Xavfsizlik sozlamalari:** Settings → Code security — Secret scanning, Push protection, Dependabot alerts yoqiladi. Settings → Actions → General — tashqi hissachilarning workflow'lari faqat tasdiq bilan ishga tushadi.
+4. **`.github/pull_request_template.md`:**
 
    ```markdown
    ## Task
@@ -53,7 +54,7 @@ Siz jamoaning "xavfsizlik to'ri"siz: kod qanday yetkazilishi (CI/CD), qayerda is
    - [ ] Haqiqiy bemor ma'lumoti, parol yoki token yo'q
    ```
 
-4. **`.github/CODEOWNERS`** (login'larni o'zingiz to'ldirasiz):
+5. **`.github/CODEOWNERS`** (login'larni o'zingiz to'ldirasiz):
 
    ```
    *                     @suyunovdev
@@ -66,13 +67,14 @@ Siz jamoaning "xavfsizlik to'ri"siz: kod qanday yetkazilishi (CI/CD), qayerda is
    /docs/                @suyunovdev
    ```
 
-5. **Bug shabloni** `.github/ISSUE_TEMPLATE/bug.yml` — maydonlar: qisqacha, muhit (local / staging / production), rol, qadamlar, kutilgan natija, haqiqiy natija, skrinshot, jiddiylik.
-6. **Belgilar (labels):** `bug`, `kritik`, `yuqori`, `o'rta`, `past`, `backend`, `frontend`, `dizayn`, `ui-review`, `pilot`, `blocked`.
-7. **Ildiz fayllari:** `.gitignore` (`node_modules`, `dist`, `.env*` lekin `!.env.example`, `uploads/`, `coverage/`, `*.log`, `.DS_Store`, `src/generated/`), `.editorconfig`, `.nvmrc` (`24`), `.gitattributes` (`* text=auto eol=lf` — Windows va Mac'dagi qator oxiri farqi PR'larni buzmasligi uchun).
+6. **Bug shabloni** `.github/ISSUE_TEMPLATE/bug.yml` — maydonlar: qisqacha, muhit (local / staging / production), rol, qadamlar, kutilgan natija, haqiqiy natija, skrinshot, jiddiylik. Shablonda ogohlantirish: "Haqiqiy bemor ma'lumoti, parol va token yozmang — issue hammaga ko'rinadi".
+7. **Belgilar (labels):** `bug`, `kritik`, `yuqori`, `o'rta`, `past`, `backend`, `frontend`, `dizayn`, `ui-review`, `pilot`, `blocked`.
+8. **Ildiz fayllari:** `.gitignore` (`node_modules`, `dist`, `.env*` lekin `!.env.example`, `uploads/`, `coverage/`, `*.log`, `.DS_Store`, `src/generated/`), `.editorconfig`, `.nvmrc` (`24`), `.gitattributes` (`* text=auto eol=lf` — Windows va Mac'dagi qator oxiri farqi PR'larni buzmasligi uchun).
 
 **Qabul mezoni**
 
-- [ ] Hamma repoga ulangan, `main` himoyalangan, PR review majburiy. Pro hali bo'lmasa — Ilyos bilan kelishilgan vaqtinchalik tartib README'da yozilgan
+- [ ] Hamma repoga ulangan, `main` himoyalangan, PR review majburiy
+- [ ] Secret scanning va Push protection yoqilgan
 - [ ] PR shabloni, CODEOWNERS, bug shabloni va belgilar bor
 - [ ] `.gitattributes`, `.gitignore`, `.nvmrc` bor
 
@@ -92,11 +94,11 @@ Siz jamoaning "xavfsizlik to'ri"siz: kod qanday yetkazilishi (CI/CD), qayerda is
 6. **GitHub Actions:**
    - `ci.yml` (PR va `main`ga push): `backend` va `frontend` job'lari — `setup-node` (24, npm kesh) → `npm ci` → lint → typecheck → test → build. `backend` job'ida e2e testlar uchun `services: postgres:17`. `concurrency` + `cancel-in-progress: true` (minutlarni tejaydi).
    - `deploy-staging.yml` (`main`ga push, CI'dan keyin): SSH → `cd /opt/f2 && git fetch && git checkout <sha> && docker compose -f docker-compose.prod.yml up -d --build` → `/api/health` bir necha marta tekshiriladi.
-   - Image'lar serverda yig'iladi, registry kerak emas (GitHub Packages'ning bepul 500 MB limiti tez to'ladi).
+   - Image'lar serverda yig'iladi — registry kerak emas.
    - Secrets: `STAGING_HOST`, `STAGING_USER`, `STAGING_SSH_KEY`, `STAGING_KNOWN_HOSTS`. `StrictHostKeyChecking=no` ishlatilmaydi.
-   - Ixtiyoriy: `gitleaks` — repoga tushib qolgan sirlarni ushlaydi.
+   - **Repo public — Actions loglari ham ochiq.** Workflow'da sirni `echo` qilmang, `set -x` ishlatmang, server manzilini va yo'llarini logga chiqarmang.
 7. Staging'da seed: `docker compose exec backend npm run db:seed`. Test akkauntlarning parollari faqat staging `.env`da; jamoaga shaxsiy xabarda beriladi.
-8. Actions minutlari: yopiq repo, bepul tarif — oyiga 2000 daqiqa. Har hafta Settings → Billing'dan qarab turing.
+8. Public repoda standart runner'lardagi Actions bepul va minut limiti yo'q.
 9. **`docs/ops/runbook.md`:** serverga kirish, deploy, loglar (`docker compose logs -f backend`), qayta ishga tushirish, oldingi versiyaga qaytish (oldingi sha → `up -d --build`), seed'ni yangilash.
 
 **Qabul mezoni**
@@ -202,7 +204,7 @@ Keyslar `arxitektura.md` 7.1 dagi qoidalardan:
 1. **Server:** Ilyos tanlagan, **O'zbekistondagi** VPS (qonun talabi — `arxitektura.md` 10-bo'lim). 2–4 vCPU, 4–8 GB RAM, 80+ GB SSD.
 2. Staging'dagi kabi himoya. **Hamma sirlar yangi:** JWT siri, baza paroli — staging'dan ko'chirilmaydi.
 3. Domen, DNS, SSL; HTTP → HTTPS yo'naltirish; HSTS. `NODE_ENV=production` — Swagger o'chiq.
-4. **Deploy** qo'lda (`workflow_dispatch` yoki serverdagi skript), faqat Ilyos ruxsati bilan.
+4. **Deploy** qo'lda: `deploy-prod.yml` (`workflow_dispatch`) GitHub'ning `production` environment'i orqali — Ilyos "required reviewer", u tasdiqlamaguncha ishga tushmaydi. Production sirlari faqat shu environment'da.
 5. **Backup:**
    - cron, har kuni 03:00 (Toshkent): `docker compose exec -T db pg_dump -Fc` + `uploads` arxivi → shifrlash (`gpg --symmetric` yoki `age`) → server tashqarisidagi saqlashga (u ham O'zbekistonda) `rclone` yoki `rsync` bilan;
    - 14 kunlik + 4 haftalik nusxa saqlanadi;

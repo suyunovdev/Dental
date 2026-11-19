@@ -22,6 +22,7 @@ Har taskning **qabul mezoni** task-trekerdagi "Natija" ustunidan olingan va TZ'd
 ## Birinchi ikki kun (19–20 noyabr) — hamma
 
 - [ ] GitHub taklifini qabul qilish, repoga kira olishni tekshirish.
+- [ ] **Repo public** — commit'dagi email hammaga ko'rinadi. GitHub → Settings → Emails → "Keep my email addresses private" ni yoqing va git'da shu sahifadagi `...@users.noreply.github.com` email'ini qo'ying: `git config --global user.email "<noreply email>"`.
 - [ ] Node.js 24 LTS, Git, Docker (Docker Desktop yoki boshqa), VS Code o'rnatish. `node -v` → `v24.x`.
 - [ ] `arxitektura.md`, `api.md` va o'z TZ'ingizni o'qish. Tushunmagan joyni yozib qo'yish.
 - [ ] 20.11 dagi T-05 uchrashuvida (Shoxjahon tushuntiradi) savollarni berish.
@@ -96,4 +97,5 @@ Agar sizni kutayotgan odam bo'lsa va siz kechiksangiz — **muddatdan oldin** gu
 - **2 soat qoidasi:** bir muammoda 2 soatdan ortiq qotib qolsangiz — guruhga yozing: nima qilmoqchi edingiz, nima qildingiz, qanday xato chiqdi (matni yoki skrinshoti bilan).
 - **Haqiqiy bemor ma'lumoti** lokal va staging'da yo'q. Skrinshot va demolarda ham faqat soxta ma'lumot.
 - **Parol va tokenlar** repoga, chatga, skrinshotga tushmaydi. `.env` — faqat o'z kompyuteringizda.
+- **Repo ochiq:** kod, commit, issue, PR va skrinshotlarni hamma ko'radi. Sir yoki haqiqiy ma'lumot push qilinib qolsa — darhol Diyorbek va Ilyosga ayting: sirni almashtirish kerak, commit'ni o'chirish yetmaydi ([arxitektura.md, 10.1](../arxitektura.md#101-ochiq-public-repo-qoidalari)).
 - **AI yordamchi** (ChatGPT, Claude va hokazo) ishlatsangiz, yozilgan kodni tushunib, o'zingiz javob bera oladigan holatda PR qiling. Review'da "nega bunday?" degan savolga javob bera olishingiz shart.

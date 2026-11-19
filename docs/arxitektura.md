@@ -623,6 +623,17 @@ sequenceDiagram
 - Serverda SSH faqat kalit bilan, root bilan kirish o'chiq, firewall faqat 22/80/443.
 - **Qonun:** "Shaxsga doir ma'lumotlar to'g'risida"gi qonun (27¹-modda) O'zbekiston fuqarolarining shaxsiy ma'lumotlarini O'zbekiston hududidagi serverlarda saqlashni talab qiladi. Production serveri va uning backup nusxasi — O'zbekistonda. Staging (soxta ma'lumot) istalgan joyda bo'lishi mumkin.
 
+### 10.1 Ochiq (public) repo qoidalari
+
+Repo public: kod, commit tarixi, issue, PR va Actions loglarini **hamma** ko'radi. Bir marta push qilingan narsa o'chirilgandan keyin ham boshqalarda yoki keshda qolishi mumkin.
+
+- Repoga hech qachon tushmaydi: `.env`, parol, token, kalit, server kirish ma'lumotlari, haqiqiy bemor ma'lumoti, klinikaning ichki fayllari, haqiqiy ma'lumot ko'ringan skrinshot.
+- Sir tasodifan push qilinsa — darhol Diyorbek va Ilyosga ayting va **sirni almashtiring** (yangi parol yoki token). Commit'ni o'chirish yetarli emas.
+- GitHub'da Secret scanning va Push protection yoqiladi (public repoda bepul): sir bor push'ni GitHub o'zi to'xtatadi.
+- Actions: sirlar faqat GitHub Secrets'da, loglarga chiqarilmaydi. `pull_request_target` ishlatilmaydi. Tashqi odamlarning (fork'dan) workflow'lari faqat tasdiq bilan ishga tushadi.
+- Har kim git'da GitHub'ning **noreply** email'ini ishlatadi — shaxsiy email commit tarixida ochilib qolmasin.
+- Xavfsizlik "kodni hech kim ko'rmaydi" degan farazga tayanmaydi: kod ochiq bo'lsa ham tizim xavfsiz bo'lishi kerak.
+
 ## 11. Muhitlar, deploy va backup
 
 | Muhit | Qayerda | Ma'lumot | Deploy | Manzil |
@@ -637,8 +648,8 @@ sequenceDiagram
 
 - Har PR'da: backend va frontend uchun `npm ci` → lint → typecheck → test → build. Qizil bo'lsa merge qilinmaydi.
 - `main`ga merge: Actions SSH orqali staging serverga kiradi → `git pull` → `docker compose build` → `docker compose up -d` → `/api/health` tekshiriladi.
-- Image'lar serverning o'zida yig'iladi (registry kerak emas). GitHub Packages'ning bepul limiti (500 MB) tez to'lib qoladi.
-- Production — qo'lda (`workflow_dispatch` yoki skript), Ilyos ruxsatidan keyin.
+- Image'lar serverning o'zida yig'iladi — registry va unga qo'shimcha sir kerak emas.
+- Production — qo'lda ishga tushiriladigan workflow (`workflow_dispatch`), GitHub'ning `production` environment'i orqali faqat Ilyos tasdiqlagandan keyin.
 
 **Backup (production):**
 
@@ -731,7 +742,7 @@ Javob kelguncha jadvaldagi taxmin bilan ishlaymiz.
 
 | # | Qaror | Nega shoshilinch | Tavsiya |
 | --- | --- | --- | --- |
-| 1 | GitHub Pro (taxminan $4/oy) | Bepul tarifdagi yopiq repoda `main`ni himoyalash, CODEOWNERS va environment'lar ishlamaydi (API 403 qaytardi). T-07 muddati 20.11 | Pro olish. Hozircha qoida og'zaki, CI orqali nazorat |
+| 1 | ✅ **Repo public qilinadi** (Ilyos qarori, 19.11) | Yopiq repoda bepul tarifda `main` himoyasi, CODEOWNERS va environment'lar ishlamaydi; public repoda hammasi bepul | Hal qilindi. Public qilishdan oldin 10.1-bo'lim qoidalarini hammaga yetkazish |
 | 2 | Production serveri O'zbekistonda | Qonun talabi (10-bo'lim). T-60 dan oldin narx va provayder kerak | 2–4 vCPU, 4–8 GB RAM, 80+ GB SSD, Toshkentdagi data-markaz |
 | 3 | FullCalendar o'rniga react-big-calendar | README'da FullCalendar yozilgan, lekin shifokor-ustunli ko'rinishi pullik | Almashtirish (Q8) |
 | 4 | Domen nomi | Staging (T-14) va production (T-60) uchun | — |

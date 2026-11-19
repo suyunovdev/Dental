@@ -249,7 +249,7 @@ Siz yaratadigan skelet, xato formati va umumiy utilitlarni butun backend ishlata
 4. **IDOR:** B shifokor A shifokorning bemori bo'yicha `teeth`, `visits`, `files`, `treatment-plans` va `id` bo'yicha yo'llarni ochishga urinadi → hammasi `403`.
 5. `arxitektura.md` 10-bo'limini band-bandi tekshirib, natijani `docs/xavfsizlik-tekshiruvi.md` ga yozing (✅/❌, tuzatish PR havolasi bilan).
 6. `npm audit --omit=dev`: high/critical yo'q yoki sababi yozilgan.
-7. Repo tarixida sir qolmaganini tekshirish (`gitleaks` — Diyorbek CI'ga qo'shgan bo'lsa, natijasini ko'ring).
+7. Repo tarixida sir qolmaganini tekshirish: GitHub'ning Secret scanning ogohlantirishlari (Security tabi) va ixtiyoriy ravishda `gitleaks`. Repo public — bu band majburiy.
 
 **Qabul mezoni**
 
