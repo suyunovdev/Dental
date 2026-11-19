@@ -9,6 +9,7 @@ Xususiy stomatologiya klinikasi uchun veb-platforma: bemorlar, qabul taqvimi, ti
 | **Tasklar** | 65 ta |
 | **Yakuniy demo** | 30-dekabr 2026 |
 | **Task-treker** | [Reja va tasklar jadvali](https://claude.ai/artifact/LfmxnjN1v4Hhgyz31x4bXt) |
+| **Hujjatlar** | [Arxitektura](docs/arxitektura.md) · [API kontrakti](docs/api.md) · [Har a'zo uchun TZ](docs/tz/README.md) |
 
 ## Mundarija
 
@@ -84,7 +85,7 @@ Frontend ham, backend ham **TypeScript**'da: jamoa bir-birining kodini o'qiy ola
 | --- | --- | --- |
 | Frontend | React + TypeScript + Vite | Eng ko'p o'quv materiali va tayyor kutubxona |
 | UI kutubxona | Ant Design | Jadval, forma, modal, sana tanlash tayyor |
-| Taqvim | FullCalendar | Qabul taqvimini noldan yozmaslik uchun |
+| Taqvim | react-big-calendar (MIT) | Shifokorlar ustun-ustun turadigan kun ko'rinishi bepul (FullCalendar'da bu ko'rinish pullik) |
 | Server ma'lumotlari | TanStack Query | Yuklash, kesh va xatolik holatlarini boshqaradi |
 | Backend | NestJS | Tayyor tuzilma, guard'lar orqali rollar, Swagger |
 | ORM | Prisma 7 | Sxema va migratsiyalar sodda |
@@ -120,26 +121,33 @@ Bitta repo (monorepo):
 │   ├── prisma/           # schema.prisma, migratsiyalar
 │   ├── prisma.config.ts
 │   └── src/
-│       ├── auth/         # login, JWT, rollar
-│       ├── users/        # xodimlar, shifokorlar, ish jadvali
-│       ├── patients/     # bemorlar
-│       ├── services/     # xizmatlar va narxlar
-│       ├── appointments/ # qabul, kreslolar
-│       ├── visits/       # tashrif, tish formulasi, davolash rejasi, fayllar
-│       ├── payments/     # to'lovlar, shifokor ulushi
-│       └── reports/      # hisobotlar
+│       ├── common/          # guard'lar, xato formati, telefon, vaqt, parol
+│       ├── auth/            # login, JWT, rollar
+│       ├── users/           # xodimlar, shifokorlar
+│       ├── audit/           # amallar jurnali
+│       ├── patients/        # bemorlar
+│       ├── catalog/         # xizmatlar va narxlar
+│       ├── schedule/        # kreslolar, shifokor ish jadvali
+│       ├── appointments/    # qabul
+│       ├── visits/          # tashrif, bajarilgan xizmatlar
+│       ├── dental-chart/    # tish formulasi
+│       ├── treatment-plans/ # davolash rejasi
+│       ├── files/           # rentgen va hujjatlar
+│       ├── payments/        # to'lovlar, chek
+│       ├── reports/         # hisobotlar, shifokor ulushi
+│       └── notifications/   # Telegram eslatma
 ├── frontend/             # React + Vite
 │   └── src/
 │       ├── pages/        # sahifalar (modul bo'yicha)
 │       ├── components/   # umumiy komponentlar
 │       ├── api/          # API klient va so'rovlar
 │       └── layouts/
-├── docs/                 # MVP hujjati, rollar jadvali, qo'llanma
+├── docs/                 # arxitektura, API kontrakti, TZ'lar, qo'llanma
 ├── docker-compose.yml
 └── README.md
 ```
 
-Ma'lumotlar bazasi: 16 ta jadval — `User`, `RefreshToken`, `DoctorSchedule`, `Chair`, `Patient`, `ServiceCategory`, `Service`, `Appointment`, `Visit`, `VisitService`, `ToothRecord`, `TreatmentPlan`, `TreatmentPlanItem`, `PatientFile`, `Payment`, `AuditLog`. To'liq sxema: `backend/prisma/schema.prisma`.
+Ma'lumotlar bazasi: 16 ta jadval — `User`, `RefreshToken`, `DoctorSchedule`, `Chair`, `Patient`, `ServiceCategory`, `Service`, `Appointment`, `Visit`, `VisitService`, `ToothRecord`, `TreatmentPlan`, `TreatmentPlanItem`, `PatientFile`, `Payment`, `AuditLog`. To'liq sxema: `backend/prisma/schema.prisma`. Maydonlar, cheklovlar va modul egalari: [docs/arxitektura.md](docs/arxitektura.md).
 
 Sxemadagi uchta asosiy qoida:
 
@@ -345,7 +353,7 @@ cd backend
 cp .env.example .env
 npm install
 npx prisma migrate dev
-npm run start:dev          # Swagger: http://localhost:3000/api
+npm run start:dev          # Swagger: http://localhost:3000/api/docs
 
 # Frontend (yangi terminalda)
 cd frontend
@@ -367,4 +375,4 @@ npm run dev                # http://localhost:5173
 
 ---
 
-Oxirgi yangilanish: 18-noyabr 2026.
+Oxirgi yangilanish: 19-noyabr 2026.
