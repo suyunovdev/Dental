@@ -17,6 +17,16 @@ Har bir jamoa a'zosi uchun alohida TZ. Avval umumiy hujjatlarni o'qing, keyin o'
 
 Har taskning **qabul mezoni** task-trekerdagi "Natija" ustunidan olingan va TZ'da kengaytirilgan. Task faqat shu ro'yxatdagi hamma band bajarilganda "Bajarildi" bo'ladi.
 
+## AI bilan ishlash
+
+Har a'zoning shaxsiy branch'i bor: `jamoa/<ism>` (masalan, `jamoa/shoxjahon`). Unda AI yordamchi uchun ko'rsatma — `docs/ai/<ism>.md`.
+
+1. `git fetch && git switch jamoa/<ism>`
+2. AI'ga (Claude Code, Cursor, Copilot va hokazo): "`docs/ai/<ism>.md` faylini to'liq o'qi va undagi ko'rsatma bo'yicha ishni boshla". Brauzerdagi chat bo'lsa — fayl matnini nusxalab yuboring.
+3. AI loyiha va qoidalarni o'qiydi, sizga reja beradi, siz "ha" desangiz — ishni boshlaydi.
+
+AI yozgan kod uchun ham **siz** javobgarsiz: review'da "nega bunday?" degan savolga o'zingiz javob bera olishingiz kerak.
+
 ---
 
 ## Birinchi ikki kun (19–20 noyabr) — hamma
