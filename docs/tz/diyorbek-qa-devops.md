@@ -26,11 +26,15 @@ Siz jamoaning "xavfsizlik to'ri"siz: kod qanday yetkazilishi (CI/CD), qayerda is
 
 ## T-07 · GitHub repo, branch qoidalari, PR shabloni · 20.11
 
-> **Muhim:** repo **public** qilinadi (Ilyos qarori). Public repoda `main` himoyasi, CODEOWNERS, environment'lar va Actions bepul ishlaydi. Shu bilan birga hamma narsa — kod, issue, PR, Actions loglari — ochiq: qoidalar `arxitektura.md` 10.1-bo'limda. Sozlamalarni faqat repo egasi yoki admin o'zgartiradi — Ilyosdan admin huquqini so'rang.
+> **Muhim:** repo **public** va Ilyosning shaxsiy akkauntida. Bunday repoda hamkorga admin roli berilmaydi — GitHub Settings'ni faqat Ilyos (egasi) o'zgartira oladi. Siz sozlamalarni tekshirasiz va nima o'zgarishi kerakligini Ilyosga aniq yozib berasiz. Repo ochiq bo'lgani uchun hamma narsa — kod, issue, PR, Actions loglari — hammaga ko'rinadi: qoidalar `arxitektura.md` 10.1-bo'limda.
 
 1. Hamma 6 kishi repoga kirganini tekshiring (taklifni qabul qilmaganlar bo'lsa — ularga yozing).
-2. **`main` himoyasi** (Settings → Rules → Rulesets): PR majburiy, kamida 1 ta tasdiq, CODEOWNERS review, CI (`backend`, `frontend`) yashil, branch `main`dan yangilangan, force-push va o'chirish taqiqlangan.
-3. **Xavfsizlik sozlamalari:** Settings → Code security — Secret scanning, Push protection, Dependabot alerts yoqiladi. Settings → Actions → General — tashqi hissachilarning workflow'lari faqat tasdiq bilan ishga tushadi.
+2. **19.11 da yoqilgan sozlamalarni tekshiring:**
+   - `main` ruleset'i ("main himoyasi"): PR majburiy, kamida 1 ta tasdiq, yangi push'dan keyin eski tasdiq bekor bo'ladi, force-push va o'chirish taqiqlangan. Ilyos zarurat bo'lsa chetlab o'ta oladi;
+   - Secret scanning, Push protection, Dependabot alerts.
+
+   Tekshirish: `gh api repos/suyunovdev/Dental/rules/branches/main` (`deletion`, `non_fast_forward`, `pull_request` chiqishi kerak) va repo sahifasidagi Security tabi.
+3. **CI tayyor bo'lgach (T-14):** Ilyosga yozing — ruleset'ga "Require status checks" (`backend`, `frontend`) qo'shiladi. CODEOWNERS fayli qo'shilgach — "Require review from Code Owners" ham yoqiladi.
 4. **`.github/pull_request_template.md`:**
 
    ```markdown
@@ -73,8 +77,8 @@ Siz jamoaning "xavfsizlik to'ri"siz: kod qanday yetkazilishi (CI/CD), qayerda is
 
 **Qabul mezoni**
 
-- [ ] Hamma repoga ulangan, `main` himoyalangan, PR review majburiy
-- [ ] Secret scanning va Push protection yoqilgan
+- [ ] Hamma repoga ulangan, `main` himoyalangan, PR review majburiy (tekshirilgan)
+- [ ] Secret scanning va Push protection yoqilganligi tekshirilgan
 - [ ] PR shabloni, CODEOWNERS, bug shabloni va belgilar bor
 - [ ] `.gitattributes`, `.gitignore`, `.nvmrc` bor
 
