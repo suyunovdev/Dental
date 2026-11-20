@@ -1,0 +1,40 @@
+name: Bug haqida xabar
+description: Loyihadagi xatolik haqida xabar berish
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Xatolik tavsifi
+      description: Nima xato bo'ldi?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Muhit
+      options:
+        - Local
+        - Staging
+        - Production
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Xatoni takrorlash qadamlari
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Kutilgan natija
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Haqiqiy natija
