@@ -337,29 +337,38 @@ Statusni task egasining o'zi shu kuni yangilaydi.
 
 ## 10. Lokal ishga tushirish
 
-> Bu bo'lim H1 oxirida (T-08, T-09, T-14 tugagach) aniq buyruqlar bilan yangilanadi. Quyida kutilayotgan tartib.
+Kerakli dasturlar: **Node.js 24 LTS**, **Docker** (Docker Engine yoki Docker Desktop), **Git**.
 
-Kerak: Node.js (LTS), Docker, Git.
-
+### 1. Reponi klonlash va sozlash
 ```bash
-git clone <repo-manzili>
-cd <repo-papkasi>
+git clone https://github.com/suyunovdev/Dental.git
+cd Dental
+```
 
-# Ma'lumotlar bazasi
+### 2. Ma'lumotlar bazasini ko'tarish (PostgreSQL 17)
+```bash
 docker compose up -d db
+```
 
-# Backend
+### 3. Backendni ishga tushirish
+```bash
 cd backend
 cp .env.example .env
+# .env dagi qiymatlarni kerak bo'lsa moslang (standart qiymatlar lokalga mos)
 npm install
-npx prisma migrate dev
-npm run start:dev          # Swagger: http://localhost:3000/api/docs
+npm run dev
+```
+- API manzili: `http://localhost:3000/api`
+- Swagger API hujjati: `http://localhost:3000/api/docs`
+- Tizim holati (health check): `http://localhost:3000/api/health`
 
-# Frontend (yangi terminalda)
-cd frontend
-cp .env.example .env
-npm install
-npm run dev                # http://localhost:5173
+### 4. Tekshiruv buyruqlari (backend)
+```bash
+npm run lint         # Kod qoidalarini tekshirish (oxlint)
+npm run typecheck    # TypeScript tiplarini tekshirish (tsc --noEmit)
+npm run test         # Unit testlar (vitest)
+npm run test:e2e     # E2E testlar (vitest e2e)
+npm run build        # Production yig'ish (nest build)
 ```
 
 ## 11. Xavflar
