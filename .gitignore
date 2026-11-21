@@ -1,0 +1,33 @@
+# Node
+node_modules/
+# Build va keshlar
+dist/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Muhit va sirlar (XAVFSIZLIK - repoga hech qachon tushmasin)
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Prisma generatsiya qilingan kod (postinstall da qayta generatsiya qilinadi)
+src/generated/
+backend/src/generated/
+
+# Test va qamrov
+coverage/
+*.lcov
+
+# IDE va OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Yuklangan fayllar va loglar
+uploads/
+backend/uploads/
+*.log
