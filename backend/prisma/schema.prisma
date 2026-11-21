@@ -6,3 +6,410 @@ generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
+
+// ==========================================
+// 6.1 ENUM'LAR
+// ==========================================
+
+enum Role {
+  ADMIN
+  RECEPTIONIST
+  DOCTOR
+  CASHIER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  ARRIVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum VisitStatus {
+  OPEN
+  COMPLETED
+}
+
+enum ToothStatus {
+  HEALTHY
+  CARIES
+  FILLED
+  PULPITIS
+  PERIODONTITIS
+  ROOT_ONLY
+  CROWN
+  IMPLANT
+  MISSING
+}
+
+enum PlanStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum PlanItemStatus {
+  PLANNED
+  DONE
+  CANCELLED
+}
+
+enum FileKind {
+  XRAY
+  PHOTO
+  DOCUMENT
+}
+
+enum PaymentType {
+  PAYMENT
+  REFUND
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+}
+
+// ==========================================
+// 6.2 JADVALLAR (16 MODEL)
+// ==========================================
+
+/// Foydalanuvchi / Xodim
+model User {
+  id                 Int       @id @default(autoincrement())
+  fullName           String
+  username           String    @unique
+  passwordHash       String
+  phone              String?
+  roles              Role[]
+  isActive           Boolean   @default(true)
+  mustChangePassword Boolean   @default(true)
+  specialty          String?
+  color              String?
+  sharePercent       Int?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  refreshTokens        RefreshToken[]
+  doctorSchedules      DoctorSchedule[]
+  doctorAppointments   Appointment[]   @relation("DoctorAppointments")
+  createdAppointments  Appointment[]   @relation("CreatedAppointments")
+  doctorVisits         Visit[]         @relation("DoctorVisits")
+  doctorTeeth          ToothRecord[]   @relation("DoctorTeeth")
+  doctorTreatmentPlans TreatmentPlan[] @relation("DoctorTreatmentPlans")
+  uploadedFiles        PatientFile[]   @relation("UploadedFiles")
+  payments             Payment[]       @relation("CashierPayments")
+  createdPatients      Patient[]       @relation("CreatedPatients")
+  auditLogs            AuditLog[]      @relation("ActorAuditLogs")
+}
+
+/// Sessiya / Refresh Token
+model RefreshToken {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash    String    @unique
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById Int?
+  userAgent    String?
+  ip           String?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+}
+
+/// Stomatologik kreslo
+model Chair {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointments Appointment[]
+}
+
+/// Shifokor haftalik ish jadvali
+model DoctorSchedule {
+  id          Int      @id @default(autoincrement())
+  doctorId    Int
+  doctor      User     @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  weekday     Int      // 1 = dushanba ... 7 = yakshanba
+  startMinute Int      // Kun boshidan daqiqa: 09:00 -> 540
+  endMinute   Int      // 18:00 -> 1080
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([doctorId, weekday])
+}
+
+/// Bemor
+model Patient {
+  id             Int       @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  middleName     String?
+  birthDate      DateTime? @db.Date
+  gender         Gender?
+  phone          String    // Unique emas: ona va bolalar bitta raqamda bo'lishi mumkin
+  phone2         String?
+  address        String?
+  allergies      String?
+  note           String?
+  telegramChatId String?
+  isArchived     Boolean   @default(false)
+  createdById    Int?
+  createdBy      User?     @relation("CreatedPatients", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  appointments   Appointment[]
+  visits         Visit[]
+  teeth          ToothRecord[]
+  treatmentPlans TreatmentPlan[]
+  files          PatientFile[]
+  payments       Payment[]
+
+  @@index([phone])
+  @@index([lastName, firstName])
+}
+
+/// Xizmat toifasi
+model ServiceCategory {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  services Service[]
+}
+
+/// Xizmat (preyskurant)
+model Service {
+  id          Int             @id @default(autoincrement())
+  categoryId  Int
+  category    ServiceCategory @relation(fields: [categoryId], references: [id])
+  code        String?         @unique
+  name        String
+  price       Int             // So'm, >= 0
+  durationMin Int             @default(30)
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  visitServices      VisitService[]
+  treatmentPlanItems TreatmentPlanItem[]
+
+  @@unique([categoryId, name])
+}
+
+/// Qabul
+model Appointment {
+  id             Int               @id @default(autoincrement())
+  patientId      Int
+  patient        Patient           @relation(fields: [patientId], references: [id])
+  doctorId       Int
+  doctor         User              @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  chairId        Int?
+  chair          Chair?            @relation(fields: [chairId], references: [id])
+  startAt        DateTime
+  endAt          DateTime
+  status         AppointmentStatus @default(SCHEDULED)
+  note           String?
+  cancelReason   String?
+  arrivedAt      DateTime?
+  reminderSentAt DateTime?
+  createdById    Int
+  createdBy      User              @relation("CreatedAppointments", fields: [createdById], references: [id])
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  visit Visit?
+
+  @@index([doctorId, startAt])
+  @@index([chairId, startAt])
+  @@index([patientId])
+}
+
+/// Tashrif
+model Visit {
+  id                 Int         @id @default(autoincrement())
+  appointmentId      Int         @unique
+  appointment        Appointment @relation(fields: [appointmentId], references: [id])
+  patientId          Int
+  patient            Patient     @relation(fields: [patientId], references: [id])
+  doctorId           Int
+  doctor             User        @relation("DoctorVisits", fields: [doctorId], references: [id])
+  status             VisitStatus @default(OPEN)
+  complaint          String?
+  diagnosis          String?
+  note               String?
+  startedAt          DateTime    @default(now())
+  completedAt        DateTime?
+  subtotal           Int         @default(0)
+  discountAmount     Int         @default(0)
+  discountReason     String?
+  total              Int         @default(0)
+  doctorSharePercent Int?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  services  VisitService[]
+  teeth     ToothRecord[]
+  payments  Payment[]
+  planItems TreatmentPlanItem[]
+  files     PatientFile[]
+
+  @@index([patientId])
+  @@index([doctorId, completedAt])
+}
+
+/// Tashrifda bajarilgan xizmat
+model VisitService {
+  id          Int      @id @default(autoincrement())
+  visitId     Int
+  visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  serviceId   Int
+  service     Service  @relation(fields: [serviceId], references: [id])
+  serviceName String   // Xizmat nomi o'sha vaqtdagi holatida nusxalanadi
+  toothNumber Int?     // FDI raqami
+  quantity    Int      @default(1)
+  unitPrice   Int      // Narx nusxalanadi
+  amount      Int      // unitPrice * quantity
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([visitId])
+}
+
+/// Tish holati yozuvi (tarix)
+model ToothRecord {
+  id          Int         @id @default(autoincrement())
+  patientId   Int
+  patient     Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  toothNumber Int         // FDI raqamlari (11-48, 51-85)
+  status      ToothStatus
+  note        String?
+  visitId     Int?
+  visit       Visit?      @relation(fields: [visitId], references: [id])
+  doctorId    Int
+  doctor      User        @relation("DoctorTeeth", fields: [doctorId], references: [id])
+  createdAt   DateTime    @default(now())
+
+  @@index([patientId, toothNumber, createdAt])
+}
+
+/// Davolash rejasi
+model TreatmentPlan {
+  id        Int        @id @default(autoincrement())
+  patientId Int
+  patient   Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId  Int
+  doctor    User       @relation("DoctorTreatmentPlans", fields: [doctorId], references: [id])
+  title     String
+  status    PlanStatus @default(ACTIVE)
+  note      String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items TreatmentPlanItem[]
+
+  @@index([patientId])
+}
+
+/// Davolash rejasi bandi
+model TreatmentPlanItem {
+  id          Int            @id @default(autoincrement())
+  planId      Int
+  plan        TreatmentPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  serviceId   Int
+  service     Service        @relation(fields: [serviceId], references: [id])
+  serviceName String
+  toothNumber Int?
+  stage       Int            @default(1)
+  quantity    Int            @default(1)
+  unitPrice   Int
+  status      PlanItemStatus @default(PLANNED)
+  visitId     Int?
+  visit       Visit?         @relation(fields: [visitId], references: [id])
+  note        String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([planId])
+}
+
+/// Bemor fayli (rentgen, rasm, hujjat)
+model PatientFile {
+  id           Int       @id @default(autoincrement())
+  patientId    Int
+  patient      Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  visitId      Int?
+  visit        Visit?    @relation(fields: [visitId], references: [id])
+  kind         FileKind
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  storageKey   String    @unique
+  note         String?
+  uploadedById Int
+  uploadedBy   User      @relation("UploadedFiles", fields: [uploadedById], references: [id])
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
+
+  @@index([patientId])
+}
+
+/// To'lov yoki qaytarish
+model Payment {
+  id              Int           @id @default(autoincrement())
+  visitId         Int
+  visit           Visit         @relation(fields: [visitId], references: [id])
+  patientId       Int
+  patient         Patient       @relation(fields: [patientId], references: [id])
+  type            PaymentType
+  method          PaymentMethod
+  amount          Int           // Doim musbat (> 0)
+  refundOfId      Int?
+  refundOf        Payment?      @relation("PaymentRefunds", fields: [refundOfId], references: [id])
+  refunds         Payment[]     @relation("PaymentRefunds")
+  note            String?
+  reason          String?       // Qaytarishda majburiy
+  cashierId       Int
+  cashier         User          @relation("CashierPayments", fields: [cashierId], references: [id])
+  clientRequestId String?       @unique // Idempotentlik kaliti
+  createdAt       DateTime      @default(now())
+
+  @@index([visitId])
+  @@index([patientId])
+  @@index([createdAt])
+}
+
+/// Amallar jurnali (Audit Log)
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  actorId   Int?
+  actor     User?    @relation("ActorAuditLogs", fields: [actorId], references: [id])
+  action    String   // CREATE, UPDATE, ARCHIVE, STATUS_CHANGE, LOGIN va h.k.
+  entity    String   // Patient, Visit, Payment va h.k.
+  entityId  Int?
+  summary   String?
+  before    Json?
+  after     Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
