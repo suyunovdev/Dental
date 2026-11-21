@@ -1,6 +1,21 @@
-import { PrismaClient, Role, Gender, AppointmentStatus, VisitStatus, ToothStatus, PaymentType, PaymentMethod } from '../src/generated/prisma';
+import 'dotenv/config';
+import pg from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+import {
+  PrismaClient,
+  Role,
+  Gender,
+  AppointmentStatus,
+  VisitStatus,
+  ToothStatus,
+  PaymentType,
+  PaymentMethod,
+} from '../src/generated/prisma/client.js';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 // bcrypt hash for 'Admin123!' (cost 12)
 const DEFAULT_PASSWORD_HASH = '$2b$12$e80yqXFvL8fFjI1Vp/t4e.o1W0gWw0O4pZ4M4M.W6K0F0A4U7T.3u';
