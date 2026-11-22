@@ -46,8 +46,11 @@ jobs:
       - name: Generate local seed passwords
         run: |
           for name in ADMIN RECEPTIONIST CASHIER DOCTOR; do
-            echo "SEED_${name}_PASSWORD=$(node -e "console.log(require('node:crypto').randomBytes(24).toString('base64url'))")" >> "$GITHUB_ENV"
+            value=$(node -e "console.log(require('node:crypto').randomBytes(24).toString('base64url'))")
+            echo "::add-mask::$value"
+            echo "SEED_${name}_PASSWORD=$value" >> "$GITHUB_ENV"
           done
       - run: npx prisma validate
       - run: npx prisma migrate reset --force
+      - run: npm run db:seed
       - run: node test/db-smoke.mjs
