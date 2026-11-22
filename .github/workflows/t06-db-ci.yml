@@ -1,0 +1,53 @@
+name: T-06 database CI
+
+on:
+  push:
+    paths:
+      - 'backend/prisma/**'
+      - 'backend/test/db-smoke.mjs'
+      - 'backend/package*.json'
+      - '.github/workflows/t06-db-ci.yml'
+  pull_request:
+    paths:
+      - 'backend/prisma/**'
+      - 'backend/test/db-smoke.mjs'
+      - 'backend/package*.json'
+      - '.github/workflows/t06-db-ci.yml'
+
+jobs:
+  database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: f2
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d f2"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DATABASE_URL: postgresql://postgres@localhost:5432/f2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - name: Generate local seed passwords
+        run: |
+          for name in ADMIN RECEPTIONIST CASHIER DOCTOR; do
+            echo "SEED_${name}_PASSWORD=$(node -e "console.log(require('node:crypto').randomBytes(24).toString('base64url'))")" >> "$GITHUB_ENV"
+          done
+      - run: npx prisma validate
+      - run: npx prisma migrate reset --force
+      - run: node test/db-smoke.mjs
