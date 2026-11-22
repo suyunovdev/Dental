@@ -188,14 +188,21 @@ describe('AuthService (Unit Testlar)', () => {
       reqMock.cookies = { rt: 'valid-refresh-token' };
       prismaMock.refreshToken.findUnique.mockResolvedValue(mockToken);
       prismaMock.refreshToken.create.mockResolvedValue({ id: 11 });
+      prismaMock.refreshToken.updateMany.mockResolvedValue({ count: 1 });
 
       const result = await authService.refreshToken(reqMock as Request, resMock as Response);
 
       expect(result.accessToken).toBe('mock-access-token');
+      expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 10, revokedAt: null },
+          data: expect.objectContaining({ revokedAt: expect.any(Date) }),
+        }),
+      );
       expect(prismaMock.refreshToken.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 10 },
-          data: expect.objectContaining({ revokedAt: expect.any(Date), replacedById: 11 }),
+          data: expect.objectContaining({ replacedById: 11 }),
         }),
       );
       expect(resMock.cookie).toHaveBeenCalledWith(
@@ -232,6 +239,23 @@ describe('AuthService (Unit Testlar)', () => {
       expect(resMock.clearCookie).toHaveBeenCalledWith('rt', expect.any(Object));
       expect(prismaMock.auditLog.create).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.objectContaining({ action: 'SECURITY_ALERT' }) }),
+      );
+    });
+
+    it('bir vaqtda ishlatilgan token ikkinchi marta yangi sessiya yaratmaydi', async () => {
+      reqMock.cookies = { rt: 'racing-token' };
+      prismaMock.refreshToken.findUnique.mockResolvedValue({
+        id: 10, userId: 1, revokedAt: null,
+        expiresAt: new Date(Date.now() + 100000),
+        user: { id: 1, username: 'admin', roles: [Role.ADMIN], isActive: true },
+      });
+      prismaMock.refreshToken.updateMany.mockResolvedValueOnce({ count: 0 });
+
+      await expect(authService.refreshToken(reqMock as Request, resMock as Response))
+        .rejects.toThrow(UnauthorizedException);
+      expect(prismaMock.refreshToken.create).not.toHaveBeenCalled();
+      expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { userId: 1, revokedAt: null } }),
       );
     });
   });

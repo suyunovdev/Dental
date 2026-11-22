@@ -175,7 +175,13 @@ export class AuthService {
     const refreshTtlDays = this.configService.get<number>('REFRESH_TTL_DAYS', 14);
     const expiresAt = new Date(Date.now() + refreshTtlDays * 24 * 60 * 60 * 1000);
 
-    const { accessToken } = await this.prisma.$transaction(async (tx) => {
+    const rotated = await this.prisma.$transaction(async (tx) => {
+      const claimed = await tx.refreshToken.updateMany({
+        where: { id: existingToken.id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      if (claimed.count !== 1) return null;
+
       const newRecord = await tx.refreshToken.create({
         data: {
           userId: existingToken.userId,
@@ -188,10 +194,7 @@ export class AuthService {
 
       await tx.refreshToken.update({
         where: { id: existingToken.id },
-        data: {
-          revokedAt: new Date(),
-          replacedById: newRecord.id,
-        },
+        data: { replacedById: newRecord.id },
       });
 
       const token = await this.generateAccessToken(
@@ -203,9 +206,19 @@ export class AuthService {
       return { accessToken: token };
     });
 
+    if (!rotated) {
+      await this.revokeAllSessions(existingToken.userId);
+      this.clearRefreshCookie(res);
+      throw new UnauthorizedException({
+        statusCode: 401,
+        code: 'UNAUTHORIZED',
+        message: 'Xavfsizlik sababli barcha sessiyalar yopildi. Qaytadan kiring.',
+      });
+    }
+
     this.setRefreshCookie(res, newRawToken);
 
-    return { accessToken };
+    return rotated;
   }
 
   /**
