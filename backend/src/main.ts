@@ -6,6 +6,8 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
+import { validationExceptionFactory } from './common/filters/validation-exception.factory.js';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -23,12 +25,16 @@ async function bootstrap() {
   // Cookie parser (refresh token uchun)
   app.use(cookieParser());
 
-  // Validatsiya qat'iy tekshiruvi
+  // Yagona global xatolar filtri
+  app.useGlobalFilters(new GlobalExceptionFilter());
+
+  // O'zbekcha validatsiya xabarlari va qat'iy tekshiruv
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: validationExceptionFactory,
     }),
   );
 
@@ -52,6 +58,8 @@ async function bootstrap() {
       .setDescription('Stomatologiya klinikasi boshqaruv platformasi REST API hujjati')
       .setVersion('1.0')
       .addBearerAuth()
+      .addTag('health', 'Tizim va ma\'lumotlar bazasi holati')
+      .addTag('patients', 'Bemorlar boshqaruvi')
       .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
