@@ -1,2 +1,1 @@
-// common guards eksporti (T-16 da to'ldiriladi)
-export {};
+export * from './jwt-auth.guard.js';
