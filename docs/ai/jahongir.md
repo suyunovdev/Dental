@@ -77,7 +77,7 @@ Fayllarni o'qiy olmasang — Jahongirdan ularni chatga yuklashni so'ra. O'qimasd
 1. TZ'dan taskni to'liq o'qi: maqsad, qadamlar, **qabul mezoni**.
 2. Jahongirga 5–10 qatorlik reja ber: nima qilinadi, qaysi fayllar, qancha vaqt, qanday xavf. U "ha" desa — boshla.
 3. Jahongirga eslat: task-trekerda statusni **Jarayonda** qilsin (trekerga sen kira olmaysan).
-4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`. Birinchi task bundan mustasno (6-bo'limga qara).
+4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`.
 5. **Frontend task:** backend kontrakti (Swagger) chiqqanmi — tekshir. Chiqqan bo'lsa `npm run gen:api` bilan tiplarni yangila; chiqmagan bo'lsa `docs/api.md` dagi shakl bo'yicha vaqtincha soxta ma'lumot bilan ishla. Har sahifada 4 holat bo'lsin: yuklanmoqda, bo'sh, xato, ma'lumot.
 6. Kichik qadamlar bilan ishla: har mantiqiy qadamdan keyin ishga tushir yoki test qil, keyin commit qil.
 7. Tugagach: kod bo'lsa — lint, typecheck, test va build lokalda o'tsin → PR och (`main`ga) → Jahongir trekerda **Tekshiruvda** qilsin.
@@ -98,27 +98,67 @@ Fayllarni o'qiy olmasang — Jahongirdan ularni chatga yuklashni so'ra. O'qimasd
 | T-50 | Kassa: to'lov, chek | T-47 (kontrakt 17.12), T-34 dizayn | 22.12 |
 | T-57 | Xatolarni tuzatish (frontend) | QA ro'yxati | 27.12 |
 
-## 6. HOZIR — birinchi qadamlar
+## 6. HOZIR — 25.11.2026 holati va keyingi qadamlar
 
-**Branch holati.** Sen `jamoa/jahongir` branch'idasan. Agar unda bo'lmasang: `git fetch && git switch jamoa/jahongir`. Bu branch'da hamma hujjatlar va shu fayl bor. **Birinchi task branch'ini shu yerdan och.** Keyingi tasklar uchun branch `main`dan ochiladi (hujjatlar PR #1 orqali `main`ga tushadi). Agar `main`da `docs/arxitektura.md` hali bo'lmasa — yana shu branch'dan och va Jahongirga ayt.
+> Bu bo'lim 25.11.2026 kechqurun yangilandi (19.11 dagi eski ko'rsatma o'rniga). Topshiriq Ilyosdan.
 
-Bu bo'lim 19.11.2026 holatiga yozilgan. Bugun keyinroq bo'lsa — trekerdagi holatga qarab davom et. Muddati o'tgan task bo'lsa, Jahongirga ayt.
+**AI, shunday ishla:** quyidagi bandlarni **tartib bilan** bajar. Har band oldidan Jahongirga 3–5 qatorlik reja ber; "ha" desa — boshla. Band tugagach "Tayyor sharti"ni birga tekshiringlar. Kodda bu yerda yozilganidan farq ko'rsang (kimdir allaqachon tuzatgan bo'lsa) — avval Jahongirga ayt.
 
-Eng yaqin muddat: **T-09 — 23.11 (dushanba)**. Keyin T-20 (29.11; Shoxjahonning auth kontrakti 26.11 da chiqadi), T-21 (01.12), T-24 (02.12).
+**Branch.** Bu faylni o'qish uchun branch almashtirish shart emas: `git fetch origin && git show origin/jamoa/jahongir:docs/ai/jahongir.md`. Saqlanmagan ishing bo'lsa, avval commit qil. Yangi task branch'i **doim eng yangi `main`dan** ochiladi: `git switch main && git pull && git switch -c feature/T-XX-...`. Boshqa odamning merge bo'lmagan branch'idan branch ochilmaydi — uning commit'lari sizning PR'ingizga qo'shilib ketadi.
 
-### 6.1 T-09 — frontend skeleti (bugundan)
+### 6.0 Hamma uchun (25.11 dan)
 
-1. Muhitni tekshir: `node -v` (24.x), `git --version`.
-2. Branch: `git switch -c feature/T-09-frontend-skelet` (shu `jamoa/jahongir`dan).
-3. TZ'dagi T-09 qadamlarini tartib bilan bajar (1–12). Router'da `arxitektura.md` 5.1 dagi **hamma** yo'l placeholder sahifa bilan bo'lsin.
-4. `frontend/README.md` — Nurmuhammad shunga qarab ishlaydi: sahifa qo'shish, query va mutation hook, xatoni ko'rsatish namunalari. Sodda va toza bo'lsin.
-5. Backend skeleti 23.11 da tayyor bo'ladi. Ungacha `/api/health` namunasida backend javob bermaganda xato holati (ErrorState) to'g'ri ko'rinishini tekshir.
-6. PR'ni iloji bo'lsa **22.11 da** och: Nurmuhammad (T-13) va Diyorbek (T-14) kutyapti. Review: Nurmuhammad.
+1. **CI qizil PR merge qilinmaydi.** Hozir `CI` workflow'i hammada qizil, chunki xato `main`ning o'zida (PR #10 tuzatadi). PR #10 tushguncha backend PR uchun `Backend CI` yashil bo'lishi shart. PR #10 dan keyin branch'ingizni `main`dan yangilang — `CI` ham yashil bo'lsin.
+2. **Approve — "kodni o'qidim va lokalda ishga tushirib ko'rdim" degani.** Har review'da kamida bitta aniq izoh yoki savol yoziladi. Avtomatik approve yoki merge (workflow, bot, token) ishlatilmaydi.
+3. **PR bazasi doim `main`.** PR ochganda: tavsifni to'ldiring, reviewer'ni belgilang. Review — 24 soat ichida. Kutib qolsangiz, reviewer'ga yozing.
+4. **Merge tartibi:** PR #10 (CI) → PR #5 (seed) va Shoxjahonning `fix/T-15` PR'i → PR #7 (T-10) → T-17, T-18, T-19. Frontendda: T-09 (hech kimni kutmaydi, tayyor bo'lishi bilan) → T-13.
+5. **Commit:** `T-XX: o'zbekcha qisqa tavsif`. Bitta PR — bitta task.
+6. **Shaxsiy token** GitHub Secrets'ga qo'yilmaydi, chatga va repoga yozilmaydi.
+7. **Treker:** statusni shu kuni yangilang. Jadval ochilmasa yoki tahrirlab bo'lmasa — Ilyosga yozing.
 
-### 6.2 Keyingi qadamlar
+### 6.1 Holat
 
-- **T-20:** 26.11 da Shoxjahonning auth kontrakti (Swagger) chiqadi — shundan boshla. Refresh interceptor namunasi TZ'da bor.
-- **T-21:** Sanjarning wireframe'lari 23.11 da tayyor bo'ladi — layout shunga qarab.
+| Task | Holat |
+| --- | --- |
+| T-09 (23.11) | Repo'da hali branch yo'q. **Muddati o'tgan** |
+| T-20 (29.11) | Boshlasa bo'ladi: auth API (T-15) `main`da tayyor |
+| T-21 (01.12), T-24 (02.12) | T-09 dan keyin |
+
+**Nega birinchi o'rinda:** T-09 tushmaguncha Nurmuhammadning T-13, T-22, T-23 va Diyorbekning frontend CI'si kutib turadi. 02.12 dagi Demo №1 shunga bog'liq.
+
+Lokalda boshlangan ish bo'lsa — **hozirgi holatida push qil** va draft PR och, tugashini kutma. Kompyuter, internet yoki o'rnatishda muammo bo'lsa — bugun Ilyosga yozilsin.
+
+### 6.2 T-09 — frontend skeleti · draft PR 26.11, merge 27.11
+
+1. `git switch main && git pull && git switch -c feature/T-09-frontend-skelet`.
+2. TZ'dagi T-09 ning 1–12 bandlari. Muhim joylari:
+   - `frontend/` da Diyorbekning `Dockerfile`i bor: `npm create vite` so'raganda mavjud fayllarni **saqlab** davom et, Dockerfile o'chmasin.
+   - Versiyalar — `arxitektura.md` 12-bo'lim: React 19, Vite 8, **Ant Design 6**, TanStack Query 5. PR #10 dagi vaqtinchalik skeletni (AntD 5, Vite 6) asos qilma; Diyorbek uni PR'dan olib tashlaydi. Agar u `main`ga tushib qolgan bo'lsa, almashtir.
+   - Ishlatilmagan `import React` yozma (React 19 da kerak emas, `tsc` xato beradi).
+   - **`package-lock.json` commit qilinadi** — CI va Docker `npm ci` ishlatadi.
+   - Skriptlar: `dev`, `build`, `preview`, `lint`, `typecheck`, `test` (test fayli bo'lmasa ham o'tsin: `vitest run --passWithNoTests`), `format`, `gen:api`.
+   - Router'da `arxitektura.md` 5.1 dagi **hamma** yo'l placeholder bilan; 404 sahifa.
+   - `frontend/README.md` — Nurmuhammad shunga qarab ishlaydi.
+3. Avval kichik ishlaydigan holat (Vite + AntD + router) → draft PR. Keyin qolgan bandlar shu PR'ga qo'shiladi.
+4. Reviewer: Nurmuhammad (shu kuni ko'radi), CI bo'yicha Diyorbek.
+
+**Tayyor sharti:** lokalda ochiladi, hamma yo'l ishlaydi, `/api/health` proksi orqali backendga yetadi, `npm ci && npm run lint && npm run typecheck && npm test && npm run build` xatosiz, `CI / frontend` yashil.
+
+### 6.3 T-20 — login · 29.11
+
+1. Backend lokalda: `docker compose up -d db`, `cd backend && npm ci && npm run dev`. Seed: PR #5 (Shoxjahon) merge bo'lgach `npm run db:seed` — ungacha `main`dagi seed paroli ishlamaydi.
+2. Shoxjahonning `fix/T-15` PR'i tushguncha backend har endpoint'ga daqiqasiga 5 so'rov beradi: 429 olsang, sabab shu, frontend xatosi emas.
+3. TZ T-20 dagi `api/client.ts` namunasi (refresh bir marta chaqiriladi). Token faqat xotirada. Chiqishda `queryClient.clear()`.
+4. Qabul mezonidagi 5 bandni Network tab'da ko'rsat, PR'ga skrinshot qo'y (soxta ma'lumot bilan).
+
+### 6.4 T-21 (01.12) va T-24 (02.12)
+
+- **T-21:** `app/menu.ts` yagona ro'yxat; menyu ham, `RequireRole` ham shundan. Sanjarning layout wireframe'i 27.11 gacha chiqadi; kechiksa, AntD standart ko'rinishida boshla.
+- **T-24:** kontrakt 26.11 da Muhammadyusufdan (PR #12). Ungacha `api.md` 4.2 bo'yicha soxta ma'lumot.
+
+### 6.5 Review
+
+Nurmuhammadning PR #11 i (format va label utilitlari) sizning review'ingizni kutyapti: o'qib chiqing va izoh yozing.
 
 ## 7. Har ish sessiyasi oxirida
 
