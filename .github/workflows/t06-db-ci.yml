@@ -52,5 +52,5 @@ jobs:
           done
       - run: npx prisma validate
       - run: npx prisma migrate reset --force
-      - run: npm run db:seed
+      - run: npx prisma db seed
       - run: node test/db-smoke.mjs

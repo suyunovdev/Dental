@@ -14,6 +14,10 @@ import {
   PaymentMethod,
 } from '../src/generated/prisma/client.js';
 
+if (process.env.NODE_ENV === 'production') {
+  throw new Error("Production muhitida seed ishga tushirilmaydi");
+}
+
 const connectionString = process.env.DATABASE_URL;
 const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
