@@ -99,10 +99,13 @@ GitHub Repo -> **Settings** -> **Secrets and variables** -> **Actions** bo'limid
 
 | Maxfiy o'zgaruvchi | Tavsif | Misol |
 | --- | --- | --- |
-| `STAGING_HOST` | Staging server IP yoki domeni | `194.xxx.xxx.xxx` yoki `staging.domen.uz` |
+| `STAGING_HOST` | Staging server IP yoki domeni | `staging.domen.uz` |
 | `STAGING_USER` | SSH foydalanuvchi | `deploy` |
 | `STAGING_SSH_KEY` | Serverga kiruvchi private SSH kalit | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
 | `STAGING_KNOWN_HOSTS` | `ssh-keyscan -H <STAGING_HOST>` natijasi | `staging.domen.uz ssh-ed25519 AAAAC3...` |
+
+Shuningdek, **Variables** bo'limida:
+- `STAGING_ENABLED` = `true` (server va secret'lar tayyor bo'lganda yoqiladi; aks holda `deploy-staging` workflow'i o'tkazib yuboriladi).
 
 > **OGOHLANTIRISH:** Repo public bo'lgani sababli GitHub Actions loglarida hech qachon sirlar `echo` qilinmaydi.
 
@@ -116,18 +119,22 @@ Serverdagi `/opt/f2/.env` fayli lokal holda saqlanadi va repoga kirmaydi:
 # Baza
 POSTGRES_USER=f2
 POSTGRES_DB=dental
-DB_PASSWORD=juda_maxfiy_staging_parol_123!
+DB_PASSWORD=<kuchli-tasodifiy-parol>
 
-# JWT kalitlari (tasodifiy 32+ belgili)
-JWT_ACCESS_SECRET=staging_jwt_access_secret_f2_dental_2026!
-JWT_REFRESH_SECRET=staging_jwt_refresh_secret_f2_dental_2026!
+# JWT kaliti (openssl rand -base64 48)
+JWT_ACCESS_SECRET=<openssl-rand-base64-48>
 
 # Dastur parametrlari
-NODE_ENV=production
+NODE_ENV=staging
 PORT=3000
 COOKIE_SECURE=false
 UPLOAD_DIR=/data/uploads
 MAX_UPLOAD_MB=15
+
+# Klinika ma'lumotlari (majburiy)
+CLINIC_NAME=F-2 Stomatologiya
+CLINIC_PHONE=+998901234567
+CLINIC_TIMEZONE=Asia/Tashkent
 ```
 
 ---
