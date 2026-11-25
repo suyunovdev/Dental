@@ -77,7 +77,7 @@ Fayllarni o'qiy olmasang — Diyorbekdan ularni chatga yuklashni so'ra. O'qimasd
 1. TZ'dan taskni to'liq o'qi: maqsad, qadamlar, **qabul mezoni**.
 2. Diyorbekka 5–10 qatorlik reja ber: nima qilinadi, qaysi fayllar, qancha vaqt, qanday xavf. U "ha" desa — boshla.
 3. Diyorbekka eslat: task-trekerda statusni **Jarayonda** qilsin (trekerga sen kira olmaysan).
-4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`. Birinchi task bundan mustasno (6-bo'limga qara).
+4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`.
 5. **DevOps task:** sozlama fayllari PR orqali qo'shiladi; GitHub Settings'ni faqat repo admini (Ilyos) o'zgartiradi — sen aniq qadamlar ro'yxatini tayyorlaysan. **QA task:** test-keyslar `docs/qa/` da, xatolar — GitHub issue (bug shabloni bilan, haqiqiy ma'lumotsiz).
 6. Kichik qadamlar bilan ishla: har mantiqiy qadamdan keyin ishga tushir yoki test qil, keyin commit qil.
 7. Tugagach: kod bo'lsa — lint, typecheck, test va build lokalda o'tsin → PR och (`main`ga) → Diyorbek trekerda **Tekshiruvda** qilsin.
@@ -97,35 +97,84 @@ Fayllarni o'qiy olmasang — Diyorbekdan ularni chatga yuklashni so'ra. O'qimasd
 | T-60 | Production, domen, SSL, kunlik backup | 26.12 | Pilot |
 | T-62 | Klinikada pilot (Ilyos bilan) | 29.12 | Topshirish |
 
-## 6. HOZIR — birinchi qadamlar
+## 6. HOZIR — 25.11.2026 holati va keyingi qadamlar
 
-**Branch holati.** Sen `jamoa/diyorbek` branch'idasan. Agar unda bo'lmasang: `git fetch && git switch jamoa/diyorbek`. Bu branch'da hamma hujjatlar va shu fayl bor. **Birinchi task branch'ini shu yerdan och.** Keyingi tasklar uchun branch `main`dan ochiladi (hujjatlar PR #1 orqali `main`ga tushadi). Agar `main`da `docs/arxitektura.md` hali bo'lmasa — yana shu branch'dan och va Diyorbekka ayt.
+> Bu bo'lim 25.11.2026 kechqurun yangilandi (19.11 dagi eski ko'rsatma o'rniga). Topshiriq Ilyosdan.
 
-Bu bo'lim 19.11.2026 holatiga yozilgan. Bugun keyinroq bo'lsa — trekerdagi holatga qarab davom et. Muddati o'tgan task bo'lsa, Diyorbekka ayt.
+**AI, shunday ishla:** quyidagi bandlarni **tartib bilan** bajar. Har band oldidan Diyorbekka 3–5 qatorlik reja ber; "ha" desa — boshla. Band tugagach "Tayyor sharti"ni birga tekshiringlar. Kodda bu yerda yozilganidan farq ko'rsang (kimdir allaqachon tuzatgan bo'lsa) — avval Diyorbekka ayt.
 
-Eng yaqin muddatlar: **T-07 — 20.11 (ertaga!)**, **T-14 — 25.11**.
+**Branch.** Bu faylni o'qish uchun branch almashtirish shart emas: `git fetch origin && git show origin/jamoa/diyorbek:docs/ai/diyorbek.md`. Saqlanmagan ishing bo'lsa, avval commit qil. Yangi task branch'i **doim eng yangi `main`dan** ochiladi: `git switch main && git pull && git switch -c feature/T-XX-...`. Boshqa odamning merge bo'lmagan branch'idan branch ochilmaydi — uning commit'lari sizning PR'ingizga qo'shilib ketadi.
 
-### 6.1 T-07 — repo qoidalari (bugun–ertaga)
+### 6.0 Hamma uchun (25.11 dan)
 
-1. Branch: `git switch -c feature/T-07-repo-qoidalari` (shu `jamoa/diyorbek`dan).
-2. TZ T-07 bo'yicha fayllar:
-   - `.github/pull_request_template.md`;
-   - `.github/CODEOWNERS` — login'larni har jamoadoshdan so'rab to'ldir, taxmin qilma;
-   - `.github/ISSUE_TEMPLATE/bug.yml` — "haqiqiy ma'lumot va parol yozmang" ogohlantirishi bilan;
-   - `.gitignore`, `.editorconfig`, `.nvmrc` (`24`), `.gitattributes` (`* text=auto eol=lf`).
-3. Belgilar (labels): `gh auth status` bilan Diyorbek kirganini tekshir, keyin TZ'dagi ro'yxat bo'yicha `gh label create ...`.
-4. GitHub Settings'ni faqat Ilyos (repo egasi) o'zgartira oladi — shaxsiy akkaunt repo'sida hamkorga admin roli berilmaydi. 19.11 da yoqilgan: `main` ruleset'i (PR majburiy, 1 ta tasdiq, force-push va o'chirish taqiq), Secret scanning, Push protection, Dependabot alerts. Sen faqat tekshir: `gh api repos/suyunovdev/Dental/rules/branches/main` (`deletion`, `non_fast_forward`, `pull_request`) va repo sahifasidagi Security tabi. CI tayyor bo'lgach (T-14) — ruleset'ga status checks qo'shishni Ilyosga yozib berasan.
-5. PR → review: Ilyos.
+1. **CI qizil PR merge qilinmaydi.** Hozir `CI` workflow'i hammada qizil, chunki xato `main`ning o'zida (PR #10 tuzatadi). PR #10 tushguncha backend PR uchun `Backend CI` yashil bo'lishi shart. PR #10 dan keyin branch'ingizni `main`dan yangilang — `CI` ham yashil bo'lsin.
+2. **Approve — "kodni o'qidim va lokalda ishga tushirib ko'rdim" degani.** Har review'da kamida bitta aniq izoh yoki savol yoziladi. Avtomatik approve yoki merge (workflow, bot, token) ishlatilmaydi.
+3. **PR bazasi doim `main`.** PR ochganda: tavsifni to'ldiring, reviewer'ni belgilang. Review — 24 soat ichida. Kutib qolsangiz, reviewer'ga yozing.
+4. **Merge tartibi:** PR #10 (CI) → PR #5 (seed) va Shoxjahonning `fix/T-15` PR'i → PR #7 (T-10) → T-17, T-18, T-19. Frontendda: T-09 (hech kimni kutmaydi, tayyor bo'lishi bilan) → T-13.
+5. **Commit:** `T-XX: o'zbekcha qisqa tavsif`. Bitta PR — bitta task.
+6. **Shaxsiy token** GitHub Secrets'ga qo'yilmaydi, chatga va repoga yozilmaydi.
+7. **Treker:** statusni shu kuni yangilang. Jadval ochilmasa yoki tahrirlab bo'lmasa — Ilyosga yozing.
 
-### 6.2 T-14 — staging va CI (21–25.11)
+### 6.1 Holat
 
-1. Skeletlar (T-08, T-09) 23.11 da tushadi. Ungacha qoralamalar: server (VPS) himoyasi ro'yxati va buyruqlari, `deploy/nginx.conf`, `docker-compose.prod.yml`, `.github/workflows/ci.yml` (TZ, T-14). Server IP'si, parollar va kalitlar repoga yozilmaydi — faqat GitHub Secrets'ga.
-2. Skeletlar tushgach: Dockerfile'lar, CI'ni haqiqiy skriptlarga ulash, staging'ga birinchi deploy.
-3. `docs/ops/runbook.md`.
+| Task | Holat |
+| --- | --- |
+| T-07 (20.11) | Fayllar `main`ga emas, `jamoa/diyorbek` ga merge bo'lgan (PR #3) — amalda **qo'llanmayapti** |
+| T-14 (25.11) | PR #8 CI qizil holatda merge bo'lgan, shuning uchun `main`da `CI` qizil. Tuzatish — **PR #10**, 1 ta TypeScript xatosi qolgan. Staging server va `STAGING_*` secret'lar yo'q |
+| T-26 (02.12) | 26.11 dan |
 
-### 6.3 T-26 — test reja (02.12)
+**PR #10 — butun jamoaning birinchi navbati:** u tushmaguncha hammaning `CI` si qizil.
 
-26.11 dan Ilyos bilan: `docs/qa/test-reja.md` va keyslar (TZ, T-26).
+### 6.2 PR #10 — T-14 · bugun–26.11
+
+1. **Frontend skeletini PR'dan olib tashla** (`frontend/index.html`, `package.json`, `src/`, `tsconfig.json`, `vite.config.ts`): u Jahongirning T-09 i, hozirgisi AntD 5 va Vite 6 bilan (arxitekturada AntD 6, Vite 8). `frontend/Dockerfile` qoladi.
+2. `ci.yml` frontend job'i skelet kelguncha yashil o'tsin — job emas, **step** darajasida shart:
+
+   ```yaml
+   - name: Install dependencies
+     if: hashFiles('frontend/package-lock.json') != ''
+     run: npm ci
+   ```
+
+   Lint, typecheck, test, build ham shu shart bilan; skelet yo'q bo'lsa "frontend skeleti hali yo'q (T-09)" deb yozadigan step. `npm ci || npm install` emas — faqat `npm ci` (workflow'da ham, Dockerfile'larda ham).
+3. `backend-ci.yml` ni o'chir: `ci.yml` bilan bir xil ish qiladi va ikkalasida ham job nomi `backend` — keyin majburiy check qilganda chalkashadi. `t06-db-ci.yml` (PR #5) qolsin.
+4. **`docker-compose.prod.yml`:**
+   - `CLINIC_NAME` va `CLINIC_PHONE` yo'q. `env.schema.ts` ularni talab qiladi — backend konteyneri ishga tushmaydi.
+   - `JWT_REFRESH_SECRET` ishlatilmaydi — olib tashla (refresh token JWT emas).
+   - `NODE_ENV: production` o'rniga `${NODE_ENV:?}`; staging'da `staging`, aks holda Swagger o'chiq bo'ladi.
+   - `COOKIE_SECURE` qo'shilsin; HTTPS bo'lgan muhitda `true`.
+   - Majburiy qiymatlar `${DB_PASSWORD:?}` ko'rinishida — bo'sh bo'lsa aniq xato bersin.
+5. **`backend/Dockerfile`:** runtime image'da `src/generated` yo'q, `prisma/seed.ts` esa `../src/generated/prisma/client.js` ni import qiladi — staging'da `npm run db:seed` yiqiladi. `COPY --from=builder /app/src/generated ./src/generated` qo'sh.
+6. **`deploy-staging.yml`:**
+   - `push` trigger'ini olib tashla: hozir CI qizil bo'lsa ham deploy ketadi va ikki marta ishlaydi. `workflow_run` + `workflow_dispatch` qolsin.
+   - Shart: `vars.STAGING_ENABLED == 'true' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'))`. `event == 'push'` muhim: fork'ning `main` branch'idan kelgan PR deploy'ni ishga tushirmasin.
+   - SHA: `${{ github.event.workflow_run.head_sha || github.sha }}`.
+   - Secret bo'lmasa `exit 0` qilma — deploy bo'lmagan, lekin yashil ko'rinadi. `STAGING_ENABLED` yo'q bo'lsa job o'zi o'tkazib yuboriladi.
+   - `ssh-keyscan` ni olib tashla, faqat `STAGING_KNOWN_HOSTS` (TZ, T-14, 6-band).
+7. PR nomi va tavsifini haqiqiy mazmunga mosla. Reviewer: Ilyos.
+
+**Tayyor sharti:** PR #10 da `CI / backend` va `CI / frontend` yashil. `docker compose -f docker-compose.prod.yml up -d --build db backend` lokalda ishlaydi, `/api/health` 200, konteyner ichida seed o'tadi (frontend image'i T-09 dan keyin tekshiriladi).
+
+### 6.3 T-07 ni `main`ga tushirish · 26.11
+
+1. `main`dan `fix/T-07-main-ga`. Fayllarni ol: `git checkout origin/feature/T-07-github-sozlamalari -- .editorconfig .gitattributes .nvmrc .github/CODEOWNERS .github/ISSUE_TEMPLATE .github/pull_request_template.md`.
+2. `.gitignore` ni **olma**: `main`dagisi to'liqroq. Unga faqat `.env.*` va `!.env.example` qo'sh.
+3. `CODEOWNERS` hozir 1 qator — TZ T-07, 5-banddagi 8 qator kerak. Ma'lum login'lar: `inoyatovs367-wq` (Shoxjahon), `yusuf18081998-blip` (Muhammadyusuf), `habibullayevnurmuhammad79-a11y` (Nurmuhammad), `diyooor-000111-dasss` (Diyorbek). Jahongir va Sanjarnikini o'zlaridan so'ra.
+4. `pull_request_template.md` TZ'dagidek: hozir unda "T-07" yozib qo'yilgan va tekshiruv ro'yxati to'liq emas.
+5. Label xatosi: `gh label edit beckend --name backend -R suyunovdev/Dental`.
+6. PR bazasi **`main`**. Reviewer: Ilyos. O'z PR'ini o'zi merge qilish mumkin emas.
+
+### 6.4 Staging server · Ilyos bilan
+
+Ilyosga aniq ro'yxat yoz: VPS (2 vCPU, 4 GB, 40 GB), `staging.<domen>` DNS, secret'lar (`STAGING_HOST`, `STAGING_USER`, `STAGING_SSH_KEY`, `STAGING_KNOWN_HOSTS`) va `STAGING_ENABLED` o'zgaruvchisi. Server kelgach: TZ T-14 ning 2–5 bandlari (deploy user, ufw, TLS; hozir nginx faqat 80-portda). IP, parol va kalit repoga, PR'ga, logga yozilmaydi.
+
+### 6.5 CI yashil bo'lgach
+
+Ilyosga yoz: `main` ruleset'iga "Require status checks" → `backend`, `frontend` qo'shsin; CODEOWNERS tushgach "Require review from Code Owners" ham.
+
+### 6.6 T-26 · 26.11–02.12
+
+`docs/qa/test-reja.md` va auth, bemorlar, xizmatlar, xodimlar keyslari (TZ, T-26). Staging bo'lguncha lokalda sinaladi. Keyslarga qo'sh: login limiti (6-urinish), boshqa endpoint'lar limitga tushmasligi, kassir xodimlar API'siga murojaat qilganda 403, harfli telefon, bloklangan xodimning keyingi so'rovi.
 
 ## 7. Har ish sessiyasi oxirida
 
