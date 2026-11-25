@@ -17,9 +17,10 @@ describe('formatMoney', () => {
     expect(formatMoney(500)).toBe("500 so'm");
   });
 
-  it('nol va manfiy summalarni to\'g\'ri formatlaydi', () => {
+  it('chegaraviy test: nol va manfiy summalarni (qaytarish / refund) to\'g\'ri formatlaydi', () => {
     expect(formatMoney(0)).toBe("0 so'm");
     expect(formatMoney(-50000)).toBe("-50 000 so'm");
+    expect(formatMoney(-1500000)).toBe("-1 500 000 so'm");
   });
 
   it('noto\'g\'ri qiymatlarda xavfsiz nol qaytaradi', () => {
@@ -27,24 +28,55 @@ describe('formatMoney', () => {
   });
 });
 
-describe('normalizePhone', () => {
-  it('9 ta raqam kiritilganda +998 prefiksini qo\'shadi', () => {
-    expect(normalizePhone('901234567')).toBe('+998901234567');
+describe('normalizePhone (TZ T-18 dagi 8 ta qat\'iy holat)', () => {
+  // 1. Probel bilan 9 ta raqam
+  it('1. "90 123 45 67" -> "+998901234567"', () => {
     expect(normalizePhone('90 123 45 67')).toBe('+998901234567');
   });
 
-  it('turli formatdagi 12 ta raqamli O\'zbekiston raqamlarini tozalaydi', () => {
-    expect(normalizePhone('998901234567')).toBe('+998901234567');
-    expect(normalizePhone('+998901234567')).toBe('+998901234567');
-    expect(normalizePhone('+998 (90) 123-45-67')).toBe('+998901234567');
-    expect(normalizePhone('+998 90 123 45 67')).toBe('+998901234567');
+  // 2. Probelsiz 9 ta raqam
+  it('2. "901234567" -> "+998901234567"', () => {
+    expect(normalizePhone('901234567')).toBe('+998901234567');
   });
 
-  it('noto\'g\'ri uzunlikdagi yoki boshqa davlat raqamlarida xato beradi', () => {
-    expect(() => normalizePhone('')).toThrow();
-    expect(() => normalizePhone('12345')).toThrow();
-    expect(() => normalizePhone('9989012345678')).toThrow();
-    expect(() => normalizePhone('+79991234567')).toThrow(); // 11 ta raqam
+  // 3. 998 bilan 12 ta raqam
+  it('3. "998901234567" -> "+998901234567"', () => {
+    expect(normalizePhone('998901234567')).toBe('+998901234567');
+  });
+
+  // 4. Qavslar va chiziqchalar bilan +998 formati
+  it('4. "+998 (90) 123-45-67" -> "+998901234567"', () => {
+    expect(normalizePhone('+998 (90) 123-45-67')).toBe('+998901234567');
+  });
+
+  // 5. Bo'sh qiymat -> null
+  it('5. bo\'sh yoki probelli qiymat -> null', () => {
+    expect(normalizePhone('')).toBeNull();
+    expect(normalizePhone('   ')).toBeNull();
+    expect(normalizePhone(null)).toBeNull();
+    expect(normalizePhone(undefined)).toBeNull();
+  });
+
+  // 6. Harf qatnashgan xato kiritish -> null (jimgina tashlab yuborilmaydi)
+  it('6. harfli xato raqam ("90abc1234567", "telefon") -> null', () => {
+    expect(normalizePhone('90abc1234567')).toBeNull();
+    expect(normalizePhone('telefon')).toBeNull();
+    expect(normalizePhone('+99890123456a')).toBeNull();
+  });
+
+  // 7. 8 ta raqam (kam raqam) -> null
+  it('7. 8 ta raqam ("90123456") -> null', () => {
+    expect(normalizePhone('90123456')).toBeNull();
+  });
+
+  // 8. 13 ta raqam (ortiqcha raqam) -> null
+  it('8. 13 ta raqam ("9989012345678") -> null', () => {
+    expect(normalizePhone('9989012345678')).toBeNull();
+  });
+
+  it('boshqa davlat kodi yoki xato formati -> null', () => {
+    expect(normalizePhone('+79991234567')).toBeNull();
+    expect(normalizePhone('12345')).toBeNull();
   });
 });
 
@@ -57,7 +89,8 @@ describe('formatPhone', () => {
 
   it('bo\'sh yoki noto\'g\'ri qiymat kelsa xavfsiz ishlaydi', () => {
     expect(formatPhone('')).toBe('');
-    expect(formatPhone('invalid')).toBe('invalid');
+    expect(formatPhone(null)).toBe('');
+    expect(formatPhone('90abc1234567')).toBe('90abc1234567');
   });
 });
 
@@ -79,26 +112,47 @@ describe('Vaqt formatlash (Toshkent vaqti UTC+5)', () => {
     expect(formatDateTime(isoUtcMorning)).toBe('03.12.2026 10:30');
     expect(formatDateTime(isoUtcNight)).toBe('04.12.2026 01:00');
     expect(formatDateTime(null)).toBe('');
+    expect(formatDateTime(undefined)).toBe('');
   });
 
   it('formatTime faqat Toshkent vaqtini HH:mm qaytaradi', () => {
     expect(formatTime(isoUtcMorning)).toBe('10:30');
     expect(formatTime(isoUtcNight)).toBe('01:00');
     expect(formatTime(null)).toBe('');
+    expect(formatTime(undefined)).toBe('');
   });
 });
 
-describe('getAge', () => {
-  it('tug\'ilgan sanadan yoshni hisoblaydi', () => {
-    // 1990-yil 1-yanvarda tug'ilgan odamning 2026-yilda yoshi 36 da bo'ladi
-    const age = getAge('1990-01-01');
-    expect(typeof age).toBe('number');
-    expect(age).toBeGreaterThanOrEqual(36);
+describe('getAge (chegaraviy testlar)', () => {
+  const currentDate = '2026-11-25T12:00:00.000Z'; // 2026-yil 25-noyabr
+
+  it('standart yosh hisoblash', () => {
+    expect(getAge('1990-01-01', currentDate)).toBe(36);
   });
 
-  it('bo\'sh yoki noto\'g\'ri sanada null qaytaradi', () => {
+  it('bugun tug\'ilgan kun: aynan bugun yosh to\'lgan bo\'lsa', () => {
+    expect(getAge('2000-11-25', currentDate)).toBe(26);
+  });
+
+  it('erta tug\'ilgan kun: tug\'ilgan kun hali kelmagan bo\'lsa', () => {
+    expect(getAge('2000-11-26', currentDate)).toBe(25);
+  });
+
+  it('kecha tug\'ilgan kun: tug\'ilgan kun kecha o\'tgan bo\'lsa', () => {
+    expect(getAge('2000-11-24', currentDate)).toBe(26);
+  });
+
+  it('29-fevralda tug\'ilgan (kabisa yili): kabisa bo\'lmagan yilda to\'g\'ri hisoblanadi', () => {
+    // 2004-yil 29-fevralda tug'ilgan, 2026-yil 25-noyabrda yoshi 22 da
+    expect(getAge('2004-02-29', currentDate)).toBe(22);
+    // 2004-yil 29-fevralda tug'ilgan, 2026-yil 28-fevralda hali to'lmagan (21 da)
+    expect(getAge('2004-02-29', '2026-02-28T12:00:00.000Z')).toBe(21);
+  });
+
+  it('bo\'sh yoki noto\'g\'ri sanalarda null qaytaradi', () => {
     expect(getAge(null)).toBeNull();
     expect(getAge(undefined)).toBeNull();
+    expect(getAge('')).toBeNull();
     expect(getAge('not-a-date')).toBeNull();
   });
 });

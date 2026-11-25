@@ -2,7 +2,7 @@
  * Dental platformasi (F-2) — Qiymatlarni formatlash utilitlari
  * Arxitektura talablari:
  * - Pul: butun so'm, minglar ajratilgan, "so'm" qo'shimchasi bilan (arxitektura.md 2-bo'lim Q5)
- * - Telefon: +998XXXXXXXXX (arxitektura.md 7.6-bo'lim)
+ * - Telefon: +998XXXXXXXXX (arxitektura.md 7.6-bo'lim, TZ T-18)
  * - Vaqt: Asia/Tashkent (UTC+5) (arxitektura.md 7.7-bo'lim)
  */
 
@@ -10,64 +10,85 @@ export const TASHKENT_OFFSET_MS = 5 * 60 * 60 * 1000;
 
 /**
  * Pul miqdorini formatlaydi: 350000 -> "350 000 so'm"
+ * Nol va manfiy summalarni to'g'ri ko'rsatadi:
+ * 0 -> "0 so'm"
+ * -50000 -> "-50 000 so'm"
  */
 export function formatMoney(amount: number): string {
   if (typeof amount !== 'number' || isNaN(amount)) {
     return "0 so'm";
   }
   const rounded = Math.round(amount);
-  const formatted = rounded
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-  return `${formatted} so'm`;
+  const isNegative = rounded < 0;
+  const absStr = Math.abs(rounded).toString();
+  const formattedAbs = absStr.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return `${isNegative ? '-' : ''}${formattedAbs} so'm`;
 }
 
 /**
  * Telefon raqamini standart formatga keltiradi (+998XXXXXXXXX)
- * Qoidalar (arxitektura.md 7.6):
- * - 9 ta raqam bo'lsa (masalan: 901234567) -> +998901234567
- * - 12 ta raqam bo'lsa va 998 bilan boshlansa -> +998901234567
- * - Har qanday qavs, bo'sh joy, chiziqchalar olib tashlanadi
- * - Boshqa uzunlik yoki xato format bo'lsa xato beradi
+ * Backend (TZ T-18) bilan 100% bir xil qoidada ishlaydi:
+ * - To'g'ri kiritilsa: "+998XXXXXXXXX"
+ * - Noto'g'ri kiritilsa (harflar bo'lsa, noto'g'ri uzunlik, bo'sh): null
+ *
+ * Qoidalar (arxitektura.md 7.6 va TZ T-18):
+ * - 9 ta raqam bo'lsa (masalan: "90 123 45 67") -> "+998901234567"
+ * - 12 ta raqam bo'lsa va 998 bilan boshlansa -> "+998901234567"
+ * - Harf yoki taqiqlangan belgilar bo'lsa (masalan: "90abc1234567") -> null (jimgina tashlab yuborilmaydi)
+ * - Bo'sh qiymat -> null
+ * - 8 yoki 13 ta raqam -> null
  */
-export function normalizePhone(raw: string): string {
+export function normalizePhone(raw: string | null | undefined): string | null {
   if (!raw || typeof raw !== 'string') {
-    throw new Error("Telefon raqami kiritilishi shart");
+    return null;
+  }
+
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  // Raqam, probel, qavslar, chiziqcha va boshidagi '+' dan boshqa har qanday belgi (harf, belgi) bo'lsa - xato
+  // Masalan: "90abc1234567" -> darhol null
+  if (/[^0-9\s()\-+]/.test(trimmed)) {
+    return null;
+  }
+
+  // '+' faqat eng boshida bo'lishi mumkin
+  const plusIndex = trimmed.indexOf('+');
+  if (plusIndex > 0 || (plusIndex === 0 && trimmed.indexOf('+', 1) !== -1)) {
+    return null;
   }
 
   // Faqat raqamlarni ajratib olamiz
-  const digits = raw.replace(/\D/g, '');
+  const digits = trimmed.replace(/\D/g, '');
 
   if (digits.length === 9) {
     return `+998${digits}`;
   }
 
-  if (digits.length === 12) {
-    if (digits.startsWith('998')) {
-      return `+${digits}`;
-    }
-    throw new Error("O'zbekiston kodi (+998) bilan boshlanishi kerak");
+  if (digits.length === 12 && digits.startsWith('998')) {
+    return `+${digits}`;
   }
 
-  throw new Error("Telefon raqami 9 yoki 12 ta raqamdan iborat bo'lishi kerak");
+  return null;
 }
 
 /**
  * Telefon raqamini ko'rsatish uchun chiroyli formatga keltiradi:
  * "+998901234567" -> "+998 90 123 45 67"
+ * Agar raqam formati noto'g'ri bo'lsa yoki bo'sh bo'lsa, xavfsiz qaytaradi
  */
-export function formatPhone(raw: string): string {
+export function formatPhone(raw: string | null | undefined): string {
   if (!raw) return '';
-  try {
-    const normalized = normalizePhone(raw);
-    const code = normalized.slice(4, 6);
-    const p1 = normalized.slice(6, 9);
-    const p2 = normalized.slice(9, 11);
-    const p3 = normalized.slice(11, 13);
-    return `+998 ${code} ${p1} ${p2} ${p3}`;
-  } catch {
-    return raw;
-  }
+  const normalized = normalizePhone(raw);
+  if (!normalized) return String(raw);
+
+  const code = normalized.slice(4, 6);
+  const p1 = normalized.slice(6, 9);
+  const p2 = normalized.slice(9, 11);
+  const p3 = normalized.slice(11, 13);
+  return `+998 ${code} ${p1} ${p2} ${p3}`;
 }
 
 /**
@@ -137,19 +158,33 @@ export function formatTime(dateInput: Date | string | number | null | undefined)
 
 /**
  * Tug'ilgan sanadan yoshni hisoblaydi (Toshkent vaqti bo'yicha)
- * Agar sana berilmagan yoki noto'g'ri bo'lsa null qaytaradi
+ * - 29-fevral kabisa yilida tug'ilganlarni to'g'ri hisoblaydi
+ * - Bugun tug'ilgan kun bo'lsa, to'liq yoshni beradi
+ * - Agar sana berilmagan yoki noto'g'ri bo'lsa null qaytaradi
+ *
+ * @param birthDateInput Bemorning tug'ilgan sanasi
+ * @param currentDateInput Hozirgi sana (testlar uchun ixtiyoriy, berilmasa hozirgi vaqt olinadi)
  */
-export function getAge(birthDateInput: Date | string | number | null | undefined): number | null {
+export function getAge(
+  birthDateInput: Date | string | number | null | undefined,
+  currentDateInput?: Date | string | number
+): number | null {
   if (!birthDateInput) return null;
   try {
-    const d = typeof birthDateInput === 'string' || typeof birthDateInput === 'number'
+    const birthDate = typeof birthDateInput === 'string' || typeof birthDateInput === 'number'
       ? new Date(birthDateInput)
       : birthDateInput;
 
-    if (isNaN(d.getTime())) return null;
+    if (isNaN(birthDate.getTime())) return null;
 
-    const nowTashkent = new Date(Date.now() + TASHKENT_OFFSET_MS);
-    const birthTashkent = new Date(d.getTime() + TASHKENT_OFFSET_MS);
+    const currentBase = currentDateInput !== undefined
+      ? (typeof currentDateInput === 'string' || typeof currentDateInput === 'number' ? new Date(currentDateInput) : currentDateInput)
+      : new Date();
+
+    if (isNaN(currentBase.getTime())) return null;
+
+    const nowTashkent = new Date(currentBase.getTime() + TASHKENT_OFFSET_MS);
+    const birthTashkent = new Date(birthDate.getTime() + TASHKENT_OFFSET_MS);
 
     let age = nowTashkent.getUTCFullYear() - birthTashkent.getUTCFullYear();
     const monthDiff = nowTashkent.getUTCMonth() - birthTashkent.getUTCMonth();
