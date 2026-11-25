@@ -77,7 +77,7 @@ Fayllarni o'qiy olmasang — Nurmuhammaddan ularni chatga yuklashni so'ra. O'qim
 1. TZ'dan taskni to'liq o'qi: maqsad, qadamlar, **qabul mezoni**.
 2. Nurmuhammadga 5–10 qatorlik reja ber: nima qilinadi, qaysi fayllar, qancha vaqt, qanday xavf. U "ha" desa — boshla.
 3. Nurmuhammadga eslat: task-trekerda statusni **Jarayonda** qilsin (trekerga sen kira olmaysan).
-4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`. Birinchi task bundan mustasno (6-bo'limga qara).
+4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`.
 5. **Frontend task:** backend kontrakti (Swagger) chiqqanmi — tekshir. Chiqqan bo'lsa `npm run gen:api` bilan tiplarni yangila; chiqmagan bo'lsa `docs/api.md` dagi shakl bo'yicha vaqtincha soxta ma'lumot bilan ishla. Har sahifada 4 holat bo'lsin: yuklanmoqda, bo'sh, xato, ma'lumot.
 6. Kichik qadamlar bilan ishla: har mantiqiy qadamdan keyin ishga tushir yoki test qil, keyin commit qil.
 7. Tugagach: kod bo'lsa — lint, typecheck, test va build lokalda o'tsin → PR och (`main`ga) → Nurmuhammad trekerda **Tekshiruvda** qilsin.
@@ -97,27 +97,55 @@ Fayllarni o'qiy olmasang — Nurmuhammaddan ularni chatga yuklashni so'ra. O'qim
 | T-51 | Dashboard va hisobotlar | T-48, T-49 (kontrakt 17.12), T-44 dizayn | 23.12 |
 | T-59 | Planshet moslashuvi, UI sayqal, "O'zgarishlar" tabi | T-53, T-58 | 27.12 |
 
-## 6. HOZIR — birinchi qadamlar
+## 6. HOZIR — 25.11.2026 holati va keyingi qadamlar
 
-**Branch holati.** Sen `jamoa/nurmuhammad` branch'idasan. Agar unda bo'lmasang: `git fetch && git switch jamoa/nurmuhammad`. Bu branch'da hamma hujjatlar va shu fayl bor. **Birinchi task branch'ini shu yerdan och.** Keyingi tasklar uchun branch `main`dan ochiladi (hujjatlar PR #1 orqali `main`ga tushadi). Agar `main`da `docs/arxitektura.md` hali bo'lmasa — yana shu branch'dan och va Nurmuhammadga ayt.
+> Bu bo'lim 25.11.2026 kechqurun yangilandi (19.11 dagi eski ko'rsatma o'rniga). Topshiriq Ilyosdan.
 
-Bu bo'lim 19.11.2026 holatiga yozilgan. Bugun keyinroq bo'lsa — trekerdagi holatga qarab davom et. Muddati o'tgan task bo'lsa, Nurmuhammadga ayt.
+**AI, shunday ishla:** quyidagi bandlarni **tartib bilan** bajar. Har band oldidan Nurmuhammadga 3–5 qatorlik reja ber; "ha" desa — boshla. Band tugagach "Tayyor sharti"ni birga tekshiringlar. Kodda bu yerda yozilganidan farq ko'rsang (kimdir allaqachon tuzatgan bo'lsa) — avval Nurmuhammadga ayt.
 
-Eng yaqin muddat: **T-13 — 25.11**. U Jahongirning skeletiga (T-09, 23.11) va Sanjarning UI kit qoralamasiga (24.11) bog'liq.
+**Branch.** Bu faylni o'qish uchun branch almashtirish shart emas: `git fetch origin && git show origin/jamoa/nurmuhammad:docs/ai/nurmuhammad.md`. Saqlanmagan ishing bo'lsa, avval commit qil. Yangi task branch'i **doim eng yangi `main`dan** ochiladi: `git switch main && git pull && git switch -c feature/T-XX-...`. Boshqa odamning merge bo'lmagan branch'idan branch ochilmaydi — uning commit'lari sizning PR'ingizga qo'shilib ketadi.
 
-### 6.1 Skelet tayyor bo'lguncha (19–23.11)
+### 6.0 Hamma uchun (25.11 dan)
 
-1. Branch: `git switch -c feature/T-13-umumiy-komponentlar` (shu `jamoa/nurmuhammad`dan).
-2. `frontend/src/lib/format.ts` va `frontend/src/lib/labels.ts` ni yoz (TZ, T-13, 2–3-band): `formatMoney`, `formatPhone`, `normalizePhone` (qoidasi — `arxitektura.md` 7.6), `formatDate` / `formatDateTime` / `formatTime` (Toshkent vaqti), `getAge`; status nomlari (`arxitektura.md` 6.1). Ranglar hozircha vaqtinchalik — Sanjarning tokenlari kelgach almashtiriladi.
-3. Shu funksiyalarga testlar yoz (`format.test.ts`) — ular T-09 dagi Vitest bilan ishga tushadi.
-4. Sanjar bilan kelishing: tokenlarni qanday formatda beradi (jadval: nom → qiymat), shunda ular `theme.ts` ga to'g'ridan-to'g'ri ko'chiriladi.
-5. Jahongirning T-09 PR'ini review qilishga tayyor tur — sen uning review hamkorisan.
+1. **CI qizil PR merge qilinmaydi.** Hozir `CI` workflow'i hammada qizil, chunki xato `main`ning o'zida (PR #10 tuzatadi). PR #10 tushguncha backend PR uchun `Backend CI` yashil bo'lishi shart. PR #10 dan keyin branch'ingizni `main`dan yangilang — `CI` ham yashil bo'lsin.
+2. **Approve — "kodni o'qidim va lokalda ishga tushirib ko'rdim" degani.** Har review'da kamida bitta aniq izoh yoki savol yoziladi. Avtomatik approve yoki merge (workflow, bot, token) ishlatilmaydi.
+3. **PR bazasi doim `main`.** PR ochganda: tavsifni to'ldiring, reviewer'ni belgilang. Review — 24 soat ichida. Kutib qolsangiz, reviewer'ga yozing.
+4. **Merge tartibi:** PR #10 (CI) → PR #5 (seed) va Shoxjahonning `fix/T-15` PR'i → PR #7 (T-10) → T-17, T-18, T-19. Frontendda: T-09 (hech kimni kutmaydi, tayyor bo'lishi bilan) → T-13.
+5. **Commit:** `T-XX: o'zbekcha qisqa tavsif`. Bitta PR — bitta task.
+6. **Shaxsiy token** GitHub Secrets'ga qo'yilmaydi, chatga va repoga yozilmaydi.
+7. **Treker:** statusni shu kuni yangilang. Jadval ochilmasa yoki tahrirlab bo'lmasa — Ilyosga yozing.
 
-### 6.2 Skelet merge bo'lgach (23.11 dan)
+### 6.1 Holat
 
-1. `git fetch && git rebase origin/main`.
-2. `app/theme.ts` (24.11 dagi qoralama tokenlar bilan), komponentlar (TZ, T-13, 4-band), `/dev/components` vitrini.
-3. Testlarni ishga tushir → PR (review: Jahongir). Muddat — 25.11.
+| Task | Holat |
+| --- | --- |
+| T-13 (25.11) | **PR #11**: `format.ts`, `labels.ts` va testlar bor — enum'lar `arxitektura.md` 6.1 ga mos. Tema, komponentlar va vitrina hali yo'q |
+| T-22, T-23 (02.12) | Kontrakt 26.11 da chiqadi |
+
+PR #11 dagi qizil CI sizning xatongiz emas: `main`da hali frontend skeleti yo'q.
+
+### 6.2 PR #11 ni tugatish · 26.11
+
+1. `normalizePhone('90abc1234567')` hozir `+998901234567` qaytaradi: harflar jimgina tashlab yuboriladi. Shifokor yoki registrator xato yozsa, boshqa odamning raqami saqlanib qolishi mumkin. Harf bo'lsa rad etilsin va test qo'shilsin.
+2. Muhammadyusuf bilan kelish: backend `normalizePhone` `null` qaytaradi (TZ, T-18), frontend hozir `throw` qiladi. Qoida (nima to'g'ri, nima xato) ikkalasida bir xil bo'lsin; test ro'yxati ham bir xil — TZ T-18 dagi 8 ta holat.
+3. Chegaraviy testlar: `formatMoney(0)`, manfiy summa (qaytarish), `null` sana, 29-fevralda tug'ilgan, bugun tug'ilgan kun.
+4. PR nomini aniqlashtir: "T-13 (1-qism): formatlash utilitlari va status nomlari". Reviewer: Jahongir.
+
+### 6.3 T-13 ning 2-qismi · T-09 dan keyin 1 kun ichida
+
+1. Jahongirning T-09 PR'ini (draft bo'lsa ham) **shu kuni** review qil — sizni to'xtatib turgan narsa shu. 27.11 kechgacha PR chiqmasa — Ilyosga yozing.
+2. Kutayotganda bo'sh turma: komponentlarni lokal vaqtinchalik Vite loyihasida yozib tur. `package.json`, `vite.config.ts` va skelet fayllarini commit **qilma** — ular Jahongirniki.
+3. T-09 tushgach `main`dan yangi branch `feature/T-13-komponentlar`: `app/theme.ts`, TZ T-13 ning 4-bandidagi komponentlar (`PageHeader`, `PhoneInput`, `MoneyText`, `MoneyInput`, `DateText`, `StatusTag`, `EmptyState`, `ErrorState`, `ConfirmButton`, `PatientSelect`, `useTableParams`), `/dev/components` vitrini.
+4. AntD'ning Button, Input, Table'ini **qayta yozma** — faqat tema va loyiha komponentlari.
+5. Sanjarning tokenlari 26.11 da kutiladi (`docs/dizayn/tokenlar.md`). Kelmasa, vaqtinchalik qiymat bilan davom et: keyin faqat `theme.ts` o'zgaradi.
+
+**Tayyor sharti:** vitrinada har komponent 4 holatda (oddiy, xato, o'chirilgan, yuklanmoqda), testlar va CI yashil, PR'da skrinshot.
+
+### 6.4 T-22 va T-23 · 02.12
+
+- `api.md` 4.4 va 4.5 bo'yicha soxta ma'lumot bilan 27.11 dan boshla. Kontrakt PR'lari (T-18, T-19) chiqqach `npm run gen:api`.
+- T-22: telefon `onBlur` da `check-phone`, `409 PATIENT_DUPLICATE` da "Kartani ochish" havolasi, qidiruv va sahifa URL'da, 4 holat.
+- T-23: narx `MoneyInput`, ADMIN bo'lmasa tahrir tugmalari umuman ko'rinmaydi.
 
 ## 7. Har ish sessiyasi oxirida
 
