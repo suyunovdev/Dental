@@ -75,32 +75,26 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Check frontend skeleton
-        id: check_skeleton
-        run: |
-          if [ -f package-lock.json ]; then
-            echo "has_skeleton=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_skeleton=false" >> $GITHUB_OUTPUT
-            echo "frontend skeleti hali yo'q (T-09)"
-          fi
+      - name: Check skeleton
+        if: hashFiles('frontend/package-lock.json') == ''
+        run: echo "frontend skeleti hali yo'q (T-09)"
 
       - name: Install dependencies
-        if: steps.check_skeleton.outputs.has_skeleton == 'true'
+        if: hashFiles('frontend/package-lock.json') != ''
         run: npm ci
 
       - name: Lint
-        if: steps.check_skeleton.outputs.has_skeleton == 'true'
+        if: hashFiles('frontend/package-lock.json') != ''
         run: npm run lint
 
       - name: Typecheck
-        if: steps.check_skeleton.outputs.has_skeleton == 'true'
+        if: hashFiles('frontend/package-lock.json') != ''
         run: npm run typecheck
 
       - name: Test
-        if: steps.check_skeleton.outputs.has_skeleton == 'true'
+        if: hashFiles('frontend/package-lock.json') != ''
         run: npm test
 
       - name: Build
-        if: steps.check_skeleton.outputs.has_skeleton == 'true'
+        if: hashFiles('frontend/package-lock.json') != ''
         run: npm run build
