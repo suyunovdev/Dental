@@ -1,2 +1,2 @@
-// common decorators eksporti (T-16 da to'ldiriladi)
-export {};
+export * from './current-user.decorator.js';
+export * from './public.decorator.js';
