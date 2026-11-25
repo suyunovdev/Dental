@@ -1,8 +1,13 @@
 name: Deploy Staging
 
 on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: deploy-staging
@@ -11,7 +16,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    needs: []
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,21 +29,32 @@ jobs:
           STAGING_KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
           GITHUB_SHA: ${{ github.sha }}
         run: |
+          if [ -z "$STAGING_HOST" ] || [ -z "$STAGING_SSH_KEY" ]; then
+            echo "::warning ::Staging secrets are not configured yet. Skipping remote deployment."
+            exit 0
+          fi
+
           mkdir -p ~/.ssh
           echo "$STAGING_SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          echo "$STAGING_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
 
-          ssh "$STAGING_USER@$STAGING_HOST" \
-            "cd /opt/f2 && git fetch && git checkout $GITHUB_SHA && docker compose -f docker-compose.prod.yml up -d --build"
+          if [ -n "$STAGING_KNOWN_HOSTS" ]; then
+            echo "$STAGING_KNOWN_HOSTS" > ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+          else
+            ssh-keyscan -H "$STAGING_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          fi
 
+          ssh -i ~/.ssh/id_ed25519 "$STAGING_USER@$STAGING_HOST" \
+            "cd /opt/f2 && git fetch origin && git checkout $GITHUB_SHA && docker compose -f docker-compose.prod.yml up -d --build"
+
+          echo "Checking health status..."
           for i in $(seq 1 30); do
-            if curl -sf http://$STAGING_HOST/api/health > /dev/null; then
+            if curl -sf "http://$STAGING_HOST/api/health" > /dev/null; then
               echo "Staging is healthy"
               exit 0
             fi
-            echo "Waiting for staging... ($i/30)"
+            echo "Waiting for staging health check... ($i/30)"
             sleep 10
           done
 
