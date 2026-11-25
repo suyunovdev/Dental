@@ -77,7 +77,7 @@ Fayllarni o'qiy olmasang — Muhammadyusufdan ularni chatga yuklashni so'ra. O'q
 1. TZ'dan taskni to'liq o'qi: maqsad, qadamlar, **qabul mezoni**.
 2. Muhammadyusufga 5–10 qatorlik reja ber: nima qilinadi, qaysi fayllar, qancha vaqt, qanday xavf. U "ha" desa — boshla.
 3. Muhammadyusufga eslat: task-trekerda statusni **Jarayonda** qilsin (trekerga sen kira olmaysan).
-4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`. Birinchi task bundan mustasno (6-bo'limga qara).
+4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`.
 5. **Backend task:** birinchi kuni kontrakt PR'i — controller + DTO + Swagger, soxta javob bilan; `docs/api.md` ham yangilanadi (`api.md`, 6-bo'lim). Frontendchi shu shaklda ishni boshlaydi. Keyin — logika va testlar.
 6. Kichik qadamlar bilan ishla: har mantiqiy qadamdan keyin ishga tushir yoki test qil, keyin commit qil.
 7. Tugagach: kod bo'lsa — lint, typecheck, test va build lokalda o'tsin → PR och (`main`ga) → Muhammadyusuf trekerda **Tekshiruvda** qilsin.
@@ -101,28 +101,108 @@ Fayllarni o'qiy olmasang — Muhammadyusufdan ularni chatga yuklashni so'ra. O'q
 | T-58 | Xavfsizlik tekshiruvi, audit log | — | 26.12 | Pilot |
 | T-61 | Klinika ma'lumotlarini kiritish | — | 28.12 | Pilot |
 
-## 6. HOZIR — birinchi qadamlar
+## 6. HOZIR — 25.11.2026 holati va keyingi qadamlar
 
-**Branch holati.** Sen `jamoa/muhammadyusuf` branch'idasan. Agar unda bo'lmasang: `git fetch && git switch jamoa/muhammadyusuf`. Bu branch'da hamma hujjatlar va shu fayl bor. **Birinchi task branch'ini shu yerdan och.** Keyingi tasklar uchun branch `main`dan ochiladi (hujjatlar PR #1 orqali `main`ga tushadi). Agar `main`da `docs/arxitektura.md` hali bo'lmasa — yana shu branch'dan och va Muhammadyusufga ayt.
+> Bu bo'lim 25.11.2026 kechqurun yangilandi (19.11 dagi eski ko'rsatma o'rniga). Topshiriq Ilyosdan.
 
-Bu bo'lim 19.11.2026 holatiga yozilgan. Bugun keyinroq bo'lsa — trekerdagi holatga qarab davom et. Muddati o'tgan task bo'lsa, Muhammadyusufga ayt.
+**AI, shunday ishla:** quyidagi bandlarni **tartib bilan** bajar. Har band oldidan Muhammadyusufga 3–5 qatorlik reja ber; "ha" desa — boshla. Band tugagach "Tayyor sharti"ni birga tekshiringlar. Kodda bu yerda yozilganidan farq ko'rsang (kimdir allaqachon tuzatgan bo'lsa) — avval Muhammadyusufga ayt.
 
-Eng yaqin muddatlar: **T-08 — 23.11 (dushanba)**, **T-10 — 25.11**, keyin **26.11 da uchta kontrakt PR'i** (T-17, T-18, T-19).
+**Branch.** Bu faylni o'qish uchun branch almashtirish shart emas: `git fetch origin && git show origin/jamoa/muhammadyusuf:docs/ai/muhammadyusuf.md`. Saqlanmagan ishing bo'lsa, avval commit qil. Yangi task branch'i **doim eng yangi `main`dan** ochiladi: `git switch main && git pull && git switch -c feature/T-XX-...`. Boshqa odamning merge bo'lmagan branch'idan branch ochilmaydi — uning commit'lari sizning PR'ingizga qo'shilib ketadi.
 
-### 6.1 T-08 — backend skeleti (bugundan)
+### 6.0 Hamma uchun (25.11 dan)
 
-1. Muhitni tekshir: `node -v` (24.x), `docker -v`, `docker compose version`. Bo'lmasa — o'rnatishda yordam ber (Windows'da: WSL2 + Docker Desktop).
-2. Branch: `git switch -c feature/T-08-backend-skelet` (shu `jamoa/muhammadyusuf`dan).
-3. TZ'dagi T-08 qadamlarini tartib bilan bajar (1–11).
-4. `schema.prisma`ga **model qo'shma** — modellarni Shoxjahon T-06 da yozadi. Sen faqat generator va datasource'ni sozlaysan va ulanish ishlashini ko'rsatasan (`/api/health` → `SELECT 1`).
-5. Prisma 7 + NestJS 12 ulanishini rasmiy NestJS "Prisma" retsepti bo'yicha qil. Muhammadyusufga tushuntir: `prisma.config.ts` nima uchun kerak, driver adapter (`@prisma/adapter-pg`) nima qiladi, generator `output` qayerga yozadi.
-6. Qabul mezoni: boshqa odam toza kompyuterda README bo'yicha 15 daqiqada ishga tushira olsin — Muhammadyusuf buni Shoxjahon yoki Diyorbekdan so'raydi.
-7. PR'ni iloji bo'lsa **22.11 da** och: Shoxjahon (T-06) va Diyorbek (T-14) shuni kutyapti. Review: Shoxjahon.
+1. **CI qizil PR merge qilinmaydi.** Hozir `CI` workflow'i hammada qizil, chunki xato `main`ning o'zida (PR #10 tuzatadi). PR #10 tushguncha backend PR uchun `Backend CI` yashil bo'lishi shart. PR #10 dan keyin branch'ingizni `main`dan yangilang — `CI` ham yashil bo'lsin.
+2. **Approve — "kodni o'qidim va lokalda ishga tushirib ko'rdim" degani.** Har review'da kamida bitta aniq izoh yoki savol yoziladi. Avtomatik approve yoki merge (workflow, bot, token) ishlatilmaydi.
+3. **PR bazasi doim `main`.** PR ochganda: tavsifni to'ldiring, reviewer'ni belgilang. Review — 24 soat ichida. Kutib qolsangiz, reviewer'ga yozing.
+4. **Merge tartibi:** PR #10 (CI) → PR #5 (seed) va Shoxjahonning `fix/T-15` PR'i → PR #7 (T-10) → T-17, T-18, T-19. Frontendda: T-09 (hech kimni kutmaydi, tayyor bo'lishi bilan) → T-13.
+5. **Commit:** `T-XX: o'zbekcha qisqa tavsif`. Bitta PR — bitta task.
+6. **Shaxsiy token** GitHub Secrets'ga qo'yilmaydi, chatga va repoga yozilmaydi.
+7. **Treker:** statusni shu kuni yangilang. Jadval ochilmasa yoki tahrirlab bo'lmasa — Ilyosga yozing.
 
-### 6.2 Keyingi qadamlar
+### 6.1 Holat
 
-- **T-10** — T-08 merge bo'lgach, `main`dan (TZ, T-10). Unda `patients` kontrakti namunasi va `common/time.ts` ham bor.
-- **26.11 ertalab:** avval `common/password.ts` (Shoxjahon login uchun kutadi), keyin T-17, T-18, T-19 kontrakt PR'lari — controller + DTO + Swagger, soxta javob bilan. Jahongir va Nurmuhammad shuni kutadi.
+| Task | Holat |
+| --- | --- |
+| T-08 (23.11) | `main`da — bajarilgan |
+| T-10 (25.11) | **PR #7**, `app.module.ts` da konflikt, review yo'q |
+| T-17 (28.11, kontrakt 26.11) | **PR #12**, CI qizil (11 ta TypeScript xatosi), kontraktga mos emas |
+| T-18 (01.12, kontrakt 26.11) | **PR #13**: faqat 2 ta DTO, ular ham kontraktga mos emas |
+| T-19 (02.12, kontrakt 26.11) | Boshlanmagan |
+| PR #9 | Avtomatik approve va merge — yopiladi (6.2) |
+
+### 6.2 Birinchi ish: PR #9 va token · bugun
+
+**Nega:** review'ning ma'nosi — ikkinchi odam kodni o'qiydi. Workflow "testlar tekshirildi" deb yozadi, lekin hech narsani tekshirmaydi. PR #8 CI qizil holatda merge bo'lgani uchun hozir `main`da `CI` qizil. Shaxsiy token repo secret'ida tursa, yozish huquqi bor har bir branch workflow'i undan foydalana oladi.
+
+1. PR #9 ni **merge qilmasdan yop**, `ci/auto-merge-workflow` branch'ini o'chir.
+2. Muhammadyusuf o'zi: GitHub → Settings → Developer settings → Personal access tokens → shu tokenni **Revoke**. AI token qiymatini so'ramaydi.
+3. Repo secret'ini o'chir: `gh secret delete AUTO_MERGE_TOKEN -R suyunovdev/Dental`. Ruxsat bermasa — Ilyosga yoz.
+4. Shu commit (`360844e`) T-17 va T-18 branch'lariga ham o'tib qolgan. Har ikkalasida (o'z branch'ing, shuning uchun `--force-with-lease` mumkin):
+
+   ```bash
+   git fetch origin
+   git switch feature/T-17-staff-api
+   git rebase --onto origin/main 360844e
+   git diff --stat origin/main...HEAD -- .github   # bo'sh chiqishi kerak
+   git push --force-with-lease
+   ```
+
+   `feature/T-18-patients-api` uchun ham xuddi shunday.
+
+**Tayyor sharti:** PR #9 yopiq, token bekor, secret yo'q, PR #12 va #13 da `.github/workflows/auto-merge.yml` yo'q. Ilyosga "bajarildi" deb yoz.
+
+### 6.3 T-10 — PR #7 · 26.11 ertalab
+
+1. `git switch feature/T-10-api-kontrakt-formati && git merge origin/main`. Konflikt faqat `backend/src/app.module.ts` da: `AuthModule` **ham**, `PatientsModule` **ham** qolsin.
+2. Endi `main`da auth bor: noto'g'ri login, tokensiz so'rov va 429 ham yagona shaklda (`path`, `timestamp` bilan) chiqishini e2e'da tekshir.
+3. `api.md` 1–2-bo'limlarini kod bilan solishtir.
+4. `patients` controller'ida guard yo'q. Shoxjahonning `fix/T-15` PR'i global guard qo'shadi — undan keyin tokensiz `GET /api/patients` → 401 ekanini tekshir.
+5. Reviewer: Shoxjahon. U bilan bugun yozish.
+
+**Tayyor sharti:** `Backend CI` yashil, konflikt yo'q, Shoxjahon approve qilgan, `/api/docs` ochiladi.
+
+### 6.4 T-17 — PR #12 · kontrakt 26.11, tayyor 28.11
+
+Manba: `api.md` 4.2 va TZ T-17. PR #7 merge bo'lgach, `main`ga rebase qil. Hozirgi koddagi farqlar:
+
+| Hozir | Bo'lishi kerak |
+| --- | --- |
+| `../generated/prisma/index.js` | `../generated/prisma/client.js` |
+| `import { Request }` | `import type { Request } from 'express'` |
+| `@Controller('api/users')` (manzil `/api/api/users`) | `@Controller('users')` |
+| `UsersModule`, `AuditModule` ulanmagan | `AppModule`ga qo'shiladi, `AuthModule` import qilinadi |
+| `actor.sub` (guard `id` beradi, audit'da kim qilgani yo'qoladi) | `@CurrentUser('id') actorId: number` yoki `CurrentUserPayload` |
+| Rol tekshiruvi yo'q: modul ulansa, istalgan xodim o'ziga ADMIN bera oladi | Hammasi ADMIN, `GET /api/doctors` — hamma. **T-16 `RolesGuard` siz merge qilinmaydi** |
+| `GET /users` sahifasiz, filtrsiz | `search, role, isActive, page, pageSize` → `Paginated<User>` (T-10 yordamchilari) |
+| `GET /users/doctors`, to'liq `User` qaytaradi | `GET /api/doctors` → `DoctorShort[]` |
+| `PATCH :id/block`, `unblock`, `reset-password` | `POST`; `reset-password` → `204` |
+| `DELETE :id` | Olib tashlanadi (kontraktda yo'q, bloklash bor) |
+| `PATCH` da `username` o'zgaradi | `api.md` da yo'q — olib tashlanadi |
+| `LAST_ADMIN` faqat o'chirishda | Bloklashda va ADMIN rolini olib tashlashda → `422 LAST_ADMIN`; o'zini bloklab bo'lmaydi |
+| Bloklash va parol tiklashda sessiyalar yopilmaydi | `AuthService.revokeAllSessions(userId)` (`main`da tayyor) |
+| `username` 3–50, `-` ruxsat | 3–32, `a-z 0-9 . _`, kichik harfga keltiriladi |
+| `roles` bo'sh bo'lishi mumkin, `color` erkin matn | `ArrayNotEmpty`; `#RRGGBB`; `DOCTOR` bo'lmasa `specialty`, `color`, `sharePercent` = `null` |
+| `USER_NOT_FOUND`, `USER_DUPLICATE`, `AppException(code, status)` | `NOT_FOUND`, `CONFLICT`; `AppException(code, status, message)` |
+| IP `x-forwarded-for` dan | `req.ip` (`trust proxy` yoqilgan) |
+| Audit alohida yoziladi | O'zgarish bilan **bitta tranzaksiyada** (`tx`) |
+| Test yo'q | `password.ts` unit testlari, users e2e, T-16 ruxsat jadvaliga qatorlar |
+
+Tartib: (1) 26.11 — kontrakt PR'i: controller + DTO + Swagger, soxta javob; (2) 27.11 — `AuditService` (hamma kutadi); (3) 28.11 — logika va testlar. PR 400 qatordan oshmasin.
+
+### 6.5 T-18 — PR #13 · kontrakt 26.11, tayyor 01.12
+
+1. `SearchPatientDto` va `PatientDuplicateDto` ni olib tashla: qidiruv uchun T-10 dagi `PatientQueryDto` (`search`, `archived`, `page`, `pageSize`) bor; dublikat — `409 PATIENT_DUPLICATE`, `details.existingId`.
+2. Birinchi: `common/phone.ts` + kamida 8 test (TZ, T-18, 1-band). Harfli kiritish natijasini Nurmuhammadning `normalizePhone()` i bilan bir xil qilib kelish — hozir frontend harflarni jimgina tashlab yuboradi.
+3. Kontrakt PR #7 dan keladi; `api.md` 4.4 bilan solishtir, Nurmuhammadga "kontrakt tayyor" deb yoz. Keyin haqiqiy logika: qidiruv, dublikat, arxiv (ADMIN), shifokor faqat `allergies`, audit.
+
+### 6.6 T-19 — kontrakt 26.11
+
+`main`dan `feature/T-19-catalog-api`: `api.md` 4.5 bo'yicha controller + DTO + Swagger, soxta javob. Nurmuhammad (T-23) kutadi. Logika 02.12 gacha.
+
+### 6.7 Boshqa
+
+- Review sizda: PR #5 (T-06 seed) va Shoxjahonning `fix/T-15` PR'i.
+- Dependabot: `undici` (`@nestjs/mau` orqali) va `tmp` (`external-editor` orqali) — ikkalasi faqat dev bog'liqlik, shoshilinch emas. `npm audit fix --force` qilma.
 
 ## 7. Har ish sessiyasi oxirida
 
