@@ -77,7 +77,7 @@ Fayllarni o'qiy olmasang — Shoxjahondan ularni chatga yuklashni so'ra. O'qimas
 1. TZ'dan taskni to'liq o'qi: maqsad, qadamlar, **qabul mezoni**.
 2. Shoxjahonga 5–10 qatorlik reja ber: nima qilinadi, qaysi fayllar, qancha vaqt, qanday xavf. U "ha" desa — boshla.
 3. Shoxjahonga eslat: task-trekerda statusni **Jarayonda** qilsin (trekerga sen kira olmaysan).
-4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`. Birinchi task bundan mustasno (6-bo'limga qara).
+4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`.
 5. **Backend task:** birinchi kuni kontrakt PR'i — controller + DTO + Swagger, soxta javob bilan; `docs/api.md` ham yangilanadi (`api.md`, 6-bo'lim). Frontendchi shu shaklda ishni boshlaydi. Keyin — logika va testlar.
 6. Kichik qadamlar bilan ishla: har mantiqiy qadamdan keyin ishga tushir yoki test qil, keyin commit qil.
 7. Tugagach: kod bo'lsa — lint, typecheck, test va build lokalda o'tsin → PR och (`main`ga) → Shoxjahon trekerda **Tekshiruvda** qilsin.
@@ -100,30 +100,81 @@ Fayllarni o'qiy olmasang — Shoxjahondan ularni chatga yuklashni so'ra. O'qimas
 | T-52 | Telegram eslatma (past ustuvorlik) | — | 23.12 | — |
 | T-56 | Xatolarni tuzatish (backend) | — | 27.12 | Pilot |
 
-## 6. HOZIR — birinchi qadamlar
+## 6. HOZIR — 25.11.2026 holati va keyingi qadamlar
 
-**Branch holati.** Sen `jamoa/shoxjahon` branch'idasan. Agar unda bo'lmasang: `git fetch && git switch jamoa/shoxjahon`. Bu branch'da hamma hujjatlar va shu fayl bor. **Birinchi task branch'ini shu yerdan och.** Keyingi tasklar uchun branch `main`dan ochiladi (hujjatlar PR #1 orqali `main`ga tushadi). Agar `main`da `docs/arxitektura.md` hali bo'lmasa — yana shu branch'dan och va Shoxjahonga ayt.
+> Bu bo'lim 25.11.2026 kechqurun yangilandi (19.11 dagi eski ko'rsatma o'rniga). Topshiriq Ilyosdan.
 
-Bu bo'lim 19.11.2026 holatiga yozilgan. Bugun keyinroq bo'lsa — trekerdagi holatga qarab davom et. Muddati o'tgan task bo'lsa, Shoxjahonga ayt.
+**AI, shunday ishla:** quyidagi bandlarni **tartib bilan** bajar. Har band oldidan Shoxjahonga 3–5 qatorlik reja ber; "ha" desa — boshla. Band tugagach "Tayyor sharti"ni birga tekshiringlar. Kodda bu yerda yozilganidan farq ko'rsang (kimdir allaqachon tuzatgan bo'lsa) — avval Shoxjahonga ayt.
 
-Eng yaqin muddatlar: **T-05 — 20.11 (ertaga)**, **T-06 — 24.11**.
+**Branch.** Bu faylni o'qish uchun branch almashtirish shart emas: `git fetch origin && git show origin/jamoa/shoxjahon:docs/ai/shoxjahon.md`. Saqlanmagan ishing bo'lsa, avval commit qil. Yangi task branch'i **doim eng yangi `main`dan** ochiladi: `git switch main && git pull && git switch -c feature/T-XX-...`. Boshqa odamning merge bo'lmagan branch'idan branch ochilmaydi — uning commit'lari sizning PR'ingizga qo'shilib ketadi.
 
-### 6.1 T-05 — ertangi uchrashuvga tayyorgarlik (bugun)
+### 6.0 Hamma uchun (25.11 dan)
 
-1. `docs/arxitektura.md` va `docs/api.md` asosida Shoxjahon uchun 30–40 daqiqalik tushuntirish rejasini tuz (TZ, T-05 dagi mavzular): har mavzuga 3–5 asosiy fikr va bitta oddiy misol.
-2. Jamoa berishi mumkin bo'lgan 10 ta savol va qisqa javoblarini tayyorla (masalan: "refresh token nega cookie'da?", "vaqt to'qnashuvi nega bazada ham tekshiriladi?").
-3. Har jamoadosh uchun bitta tekshiruv savoli: "Birinchi taskingiz kodi qaysi papkada va kimdan nimani kutasiz?" — to'g'ri javoblari bilan (ularning TZ'laridan).
-4. Shoxjahonning o'zi tushunganini tekshir: unga 3–4 savol ber.
-5. Bu tayyorgarlik materiali repoga commit qilinmaydi. Uchrashuvdan keyin qaror yoki o'zgarish chiqsa — `feature/T-05-arxitektura-izohlari` branch'ida `docs/arxitektura.md` ga PR.
+1. **CI qizil PR merge qilinmaydi.** Hozir `CI` workflow'i hammada qizil, chunki xato `main`ning o'zida (PR #10 tuzatadi). PR #10 tushguncha backend PR uchun `Backend CI` yashil bo'lishi shart. PR #10 dan keyin branch'ingizni `main`dan yangilang — `CI` ham yashil bo'lsin.
+2. **Approve — "kodni o'qidim va lokalda ishga tushirib ko'rdim" degani.** Har review'da kamida bitta aniq izoh yoki savol yoziladi. Avtomatik approve yoki merge (workflow, bot, token) ishlatilmaydi.
+3. **PR bazasi doim `main`.** PR ochganda: tavsifni to'ldiring, reviewer'ni belgilang. Review — 24 soat ichida. Kutib qolsangiz, reviewer'ga yozing.
+4. **Merge tartibi:** PR #10 (CI) → PR #5 (seed) va Shoxjahonning `fix/T-15` PR'i → PR #7 (T-10) → T-17, T-18, T-19. Frontendda: T-09 (hech kimni kutmaydi, tayyor bo'lishi bilan) → T-13.
+5. **Commit:** `T-XX: o'zbekcha qisqa tavsif`. Bitta PR — bitta task.
+6. **Shaxsiy token** GitHub Secrets'ga qo'yilmaydi, chatga va repoga yozilmaydi.
+7. **Treker:** statusni shu kuni yangilang. Jadval ochilmasa yoki tahrirlab bo'lmasa — Ilyosga yozing.
 
-### 6.2 T-06 — baza sxemasi (bugundan, 24.11 gacha)
+### 6.1 Holat
 
-1. Branch: `git switch -c feature/T-06-db-sxema` (shu `jamoa/shoxjahon`dan).
-2. `backend/` papkasini Muhammadyusuf T-08 da yaratadi (23.11 gacha). Ungacha `backend/prisma/schema.prisma` faylida `arxitektura.md` 6-bo'lim bo'yicha **enum va modellarni** yoz. Tekshirish uchun vaqtincha generator va datasource bloklarini qo'shsang bo'ladi — keyin T-08 dagisi qoladi.
-3. Tekshiruv: `npx prisma@7 format --schema backend/prisma/schema.prisma` va `npx prisma@7 validate --schema backend/prisma/schema.prisma` — xatosiz.
-4. Muhammadyusuf bilan kelishuv: T-08 `schema.prisma`ga model qo'shmaydi, faqat generator va datasource.
-5. T-08 `main`ga tushgach: `git fetch && git rebase origin/main`. Konfliktda T-08 dagi generator va datasource'ni qoldir, modellaringni qo'sh. Keyin: `npm run dev` (baza ko'tariladi) → `npx prisma migrate dev --name init` → 6.3-bo'lim SQL'i uchun `--create-only` migratsiya → `prisma/seed.ts` (TZ, T-06, 5-band).
-6. TZ'dagi qabul mezonlarini tekshir → PR (review: Muhammadyusuf).
+| Task | Holat |
+| --- | --- |
+| T-05 | Hujjatlar `main`da. Jamoaga tushuntirish bo'lganini trekerda belgilang |
+| T-06 (24.11) | 16 model, migratsiya va cheklovlar `main`da (PR #6 bilan birga tushgan). Seed tuzatishi **PR #5** da, CI qizil |
+| T-15 (29.11) | `main`da, muddatidan oldin — yaxshi. 2 ta xato topildi (6.3) |
+| T-16 (02.12) | Boshlanmagan |
+| Review | **PR #7** (T-10) 22.11 dan beri sizni kutyapti; keyin #12 (T-17) va #13 (T-18) |
+
+### 6.2 PR #5 — T-06 seed · muddat 26.11
+
+**Nima xato:**
+
+- `main`dagi `backend/prisma/seed.ts` hash'i izohdagi parolga mos emas (bcryptjs bilan tekshirildi): seed foydalanuvchilari bilan **kirib bo'lmaydi**. Parol matni ham ochiq repoda turibdi. PR #5 parollarni env'ga o'tkazib to'g'ri yo'l tutgan.
+- `T-06 database CI` → `User: 0, kutilgan 6`. Sabab (ehtimol): Prisma 7 da `prisma migrate reset` seed'ni o'zi chaqirmaydi. Buni rasmiy hujjatdan tasdiqla.
+- `seed.ts` hamma jadvalni `deleteMany()` qiladi, production'da ishlab ketishidan himoya yo'q.
+
+**Qadamlar:**
+
+1. `git switch feature/T-06-db-sxema && git fetch origin && git merge origin/main`.
+2. `.github/workflows/t06-db-ci.yml`: `migrate reset --force` dan keyin `- run: npx prisma db seed`. (`.github/` — Diyorbekniki, uni PR'ga ikkinchi reviewer qil.)
+3. `seed.ts` boshiga: `NODE_ENV === 'production'` bo'lsa — aniq xabar bilan to'xtasin.
+4. Ildizdagi `.env.example` ga `SEED_RECEPTIONIST_PASSWORD`, `SEED_CASHIER_PASSWORD`, `SEED_DOCTOR_PASSWORD` (qiymatsiz).
+5. Lokal sinov. Avval `DATABASE_URL` **localhost** ekanini tekshir, chunki `reset` bazani o'chiradi: `npx prisma migrate reset --force && npx prisma db seed && node test/db-smoke.mjs`.
+6. Seed admini bilan `POST /api/auth/login` → 200 ekanini ko'r.
+7. PR tavsifi hozir bo'sh — to'ldir. Reviewer: Muhammadyusuf.
+
+**Tayyor sharti:** database CI yashil; seed admini bilan kirish ishlaydi; repoda parol matni yo'q; `psql` da ustma-ust ikki qabul rad etiladi.
+
+### 6.3 `fix/T-15-throttler-va-global-guard` · muddat 26.11
+
+**Nima xato:**
+
+- `auth.module.ts` da `ThrottlerGuard` global (`APP_GUARD`), limit 5/daqiqa. Natijada **har endpoint** bir IP'dan daqiqasiga 5 so'rov qabul qiladi: `/auth/refresh`, `/auth/me`, `/health` ham. Klinikada hamma xodim bitta IP'da — tizim ishlamay qoladi. TZ'da limit faqat login uchun.
+- `JwtAuthGuard` global emas. Yangi controller'da `@UseGuards` unutilsa, endpoint ochiq qoladi (PR #7 dagi `patients` controller'ida hozir guard yo'q).
+- `backend/test/setup-env.ts` va `auth.e2e-spec.ts` `DATABASE_URL`ni qat'iy yozib qo'yadi, CI bergan qiymat ishlatilmaydi.
+
+**Qadamlar:**
+
+1. `main`dan `fix/T-15-throttler-va-global-guard`.
+2. `APP_GUARD`dan `ThrottlerGuard`ni ol; login metodiga `@UseGuards(ThrottlerGuard)` qo'y (mavjud `@Throttle` qoladi).
+3. T-16 ning 1-bandi: `JwtAuthGuard` ni `APP_GUARD` qil. `@Public()` — login, refresh va **health** (aks holda staging health tekshiruvi 401 oladi). `health/` Muhammadyusufniki — u bilan kelish.
+4. Testlarda `process.env.X ??= ...`.
+5. E2E: 6-login → 429; ketma-ket 20 ta `GET /api/health` → hammasi 200; tokensiz himoyalangan endpoint → 401.
+
+**Tayyor sharti:** testlar yashil, `Backend CI` yashil, review Muhammadyusufdan.
+
+### 6.4 Review · bugun–ertaga
+
+PR #7 (T-10) birinchi: T-17, T-18, T-19 va butun frontend shunga bog'liq. Tekshir: `api.md` 2-bo'lim bilan bir xil xato shakli, 400/401/403/404/409/422/429/500 testlari, auth xatolari ham shu shaklda chiqishi. PR #12 ni 6.0-bo'limdagi qoida bo'yicha, muallif tuzatgandan keyin ko'r.
+
+### 6.5 T-16 davomi · 02.12
+
+`RolesGuard` + `@Roles`, `mustChangePassword` tekshiruvi, `MedicalAccessService.assertCanView`, ruxsatlar e2e jadvali (TZ, T-16). **T-17 rol tekshiruvisiz merge qilinmaydi**, shuning uchun `RolesGuard` qismini 28.11 gacha alohida kichik PR bilan ber.
+
+Auth va seed tayyor bo'lgach, Jahongirga yoz: T-20 ni haqiqiy API bilan boshlasin.
 
 ## 7. Har ish sessiyasi oxirida
 
