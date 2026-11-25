@@ -77,7 +77,7 @@ Fayllarni o'qiy olmasang — Sanjardan ularni chatga yuklashni so'ra. O'qimasdan
 1. TZ'dan taskni to'liq o'qi: maqsad, qadamlar, **qabul mezoni**.
 2. Sanjarga 5–10 qatorlik reja ber: nima qilinadi, qaysi fayllar, qancha vaqt, qanday xavf. U "ha" desa — boshla.
 3. Sanjarga eslat: task-trekerda statusni **Jarayonda** qilsin (trekerga sen kira olmaysan).
-4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`. Birinchi task bundan mustasno (6-bo'limga qara).
+4. Branch: eng yangi `main`dan — `git switch main && git pull && git switch -c feature/T-XX-...`.
 5. **Dizayn task:** asosiy natija — Figma'da (Sanjar chizadi). Repoga faqat matnli materiallar `docs/dizayn/` papkasiga PR qilinadi. Har ekran bo'yicha frontendchilardan so'raladi: "bu Ant Design bilan qilinadimi?"
 6. Kichik qadamlar bilan ishla: har mantiqiy qadamdan keyin ishga tushir yoki test qil, keyin commit qil.
 7. Tugagach: kod bo'lsa — lint, typecheck, test va build lokalda o'tsin → PR och (`main`ga) → Sanjar trekerda **Tekshiruvda** qilsin.
@@ -96,36 +96,63 @@ Fayllarni o'qiy olmasang — Sanjardan ularni chatga yuklashni so'ra. O'qimasdan
 | T-53 | Dizayn tekshiruvi (UI review) | 21.12 | Jahongir, Nurmuhammad |
 | T-64 | Demo taqdimot va ekran rasmlari | 29.12 | Ilyos (T-65) |
 
-## 6. HOZIR — birinchi qadamlar
+## 6. HOZIR — 25.11.2026 holati va keyingi qadamlar
 
-**Branch holati.** Sen `jamoa/sanjar` branch'idasan. Agar unda bo'lmasang: `git fetch && git switch jamoa/sanjar`. Bu branch'da hamma hujjatlar va shu fayl bor. **Birinchi task branch'ini shu yerdan och.** Keyingi tasklar uchun branch `main`dan ochiladi (hujjatlar PR #1 orqali `main`ga tushadi). Agar `main`da `docs/arxitektura.md` hali bo'lmasa — yana shu branch'dan och va Sanjarga ayt.
+> Bu bo'lim 25.11.2026 kechqurun yangilandi (19.11 dagi eski ko'rsatma o'rniga). Topshiriq Ilyosdan.
 
-Bu bo'lim 19.11.2026 holatiga yozilgan. Bugun keyinroq bo'lsa — trekerdagi holatga qarab davom et. Muddati o'tgan task bo'lsa, Sanjarga ayt.
+**AI, shunday ishla:** quyidagi bandlarni **tartib bilan** bajar. Har band oldidan Sanjarga 3–5 qatorlik reja ber; "ha" desa — boshla. Band tugagach "Tayyor sharti"ni birga tekshiringlar. Kodda bu yerda yozilganidan farq ko'rsang (kimdir allaqachon tuzatgan bo'lsa) — avval Sanjarga ayt.
 
-Eng yaqin muddatlar: **T-11 wireframe'lar — 23.11**, **T-12 UI kit — qoralama 24.11, yakuniy 25.11**.
+**Branch.** Bu faylni o'qish uchun branch almashtirish shart emas: `git fetch origin && git show origin/jamoa/sanjar:docs/ai/sanjar.md`. Saqlanmagan ishing bo'lsa, avval commit qil. Yangi task branch'i **doim eng yangi `main`dan** ochiladi: `git switch main && git pull && git switch -c feature/T-XX-...`. Boshqa odamning merge bo'lmagan branch'idan branch ochilmaydi — uning commit'lari sizning PR'ingizga qo'shilib ketadi.
 
-Figma ulanmagan bo'lsa, sen (AI) Figma'da chiza olmaysan. Sening foydang — tuzilma, matn va tekshiruv; chizishni Sanjar qiladi.
+### 6.0 Hamma uchun (25.11 dan)
 
-### 6.1 T-11 uchun materiallar (bugun–ertaga)
+1. **CI qizil PR merge qilinmaydi.** Hozir `CI` workflow'i hammada qizil, chunki xato `main`ning o'zida (PR #10 tuzatadi). PR #10 tushguncha backend PR uchun `Backend CI` yashil bo'lishi shart. PR #10 dan keyin branch'ingizni `main`dan yangilang — `CI` ham yashil bo'lsin.
+2. **Approve — "kodni o'qidim va lokalda ishga tushirib ko'rdim" degani.** Har review'da kamida bitta aniq izoh yoki savol yoziladi. Avtomatik approve yoki merge (workflow, bot, token) ishlatilmaydi.
+3. **PR bazasi doim `main`.** PR ochganda: tavsifni to'ldiring, reviewer'ni belgilang. Review — 24 soat ichida. Kutib qolsangiz, reviewer'ga yozing.
+4. **Merge tartibi:** PR #10 (CI) → PR #5 (seed) va Shoxjahonning `fix/T-15` PR'i → PR #7 (T-10) → T-17, T-18, T-19. Frontendda: T-09 (hech kimni kutmaydi, tayyor bo'lishi bilan) → T-13.
+5. **Commit:** `T-XX: o'zbekcha qisqa tavsif`. Bitta PR — bitta task.
+6. **Shaxsiy token** GitHub Secrets'ga qo'yilmaydi, chatga va repoga yozilmaydi.
+7. **Treker:** statusni shu kuni yangilang. Jadval ochilmasa yoki tahrirlab bo'lmasa — Ilyosga yozing.
 
-1. Branch: `git switch -c feature/T-11-dizayn-materiallari` (shu `jamoa/sanjar`dan).
-2. `docs/dizayn/oqimlar.md` — TZ T-11 dagi 5 ta foydalanuvchi oqimi mermaid diagrammasi (`flowchart`) ko'rinishida: har qadamda kim, qaysi ekran, qaysi tugma.
-3. `docs/dizayn/ekranlar.md` — 10 ta ekranning har biri uchun ro'yxat:
-   - qaysi ma'lumot ko'rinadi (maydonlar — `api.md` 3-bo'limdagi tiplardan);
-   - qaysi amallar bor (tugmalar);
-   - qaysi holatlar bo'ladi (yuklanmoqda, bo'sh, xato, ruxsat yo'q);
-   - kim ko'radi (`arxitektura.md` 9-bo'lim).
+### 6.1 Holat
 
-   Sanjar wireframe'ni shu ro'yxat bo'yicha chizadi — hech narsa unutilmaydi.
-4. `docs/dizayn/matnlar.md` — ekranlardagi o'zbekcha matnlar (tugma, sarlavha, xato xabari): qisqa, bir xil atamalar bilan.
-5. 21.11 dagi klinika intervyusidan keyin Ilyosning yozuvlarini (Sanjar so'raydi) shu fayllarga kirit.
-6. PR (`docs/dizayn/`), review — Ilyos (`docs/` egasi). Figma havolasini PR tavsifiga qo'sh.
+| Task | Holat |
+| --- | --- |
+| T-11 (23.11) | Repo'da `docs/dizayn/` yo'q. Figma'da bo'lsa, jamoa uni ko'ra olmayapti |
+| T-12 (qoralama 24.11, yakuniy 25.11) | Tokenlar jadvali yo'q — Nurmuhammad (T-13) kutyapti |
+| T-25 (30.11) | T-11 dan keyin |
 
-### 6.2 T-12 uchun (22–25.11)
+**AI, birinchi savol:** Sanjardan Figma'da nima tayyorligini so'ra va shunga qarab boshla. Tayyor narsani qaytadan qilma. Figma yoki internetda muammo bo'lsa — bugun Ilyosga yozilsin.
 
-1. "Dizayn yo'nalishi" matnini Sanjar bilan birga yoz (TZ, T-12, 1-band).
-2. `docs/dizayn/tokenlar.md` — jadval: AntD token nomi → qiymat → izoh. Nurmuhammad uni `theme.ts` ga ko'chiradi; qoralama 24.11 da kerak.
-3. Ranglar kontrastini hisobla (WCAG AA: oddiy matn uchun kamida 4.5:1) va natijani jadvalga yoz. Shifokorlar uchun 10 ta rang palitrasini oq va qora matn bilan tekshir.
+### 6.2 Tokenlar (T-12) · 26.11
+
+1. `main`dan `feature/T-12-dizayn-tokenlari`.
+2. `docs/dizayn/tokenlar.md` — jadval: AntD token nomi → qiymat → izoh. Kamida: `colorPrimary` (`#1677ff` emas), `colorSuccess`, `colorWarning`, `colorError`, `colorInfo`, matn/chegara/fon kulranglari, `fontFamily`, `fontSize`, `borderRadius`, `controlHeight` (32; planshet 40). To'liq bo'lmasa ham qoralamani ber: Nurmuhammadga keyin faqat qiymat almashtirish qoladi.
+3. Ma'noli ranglar: qabul statuslari (6), tish holatlari (9, kodi bilan), to'lov usullari, reja bandi holatlari. Hozirgi vaqtinchalik ranglar va nomlar — Nurmuhammadning PR #11 idagi `frontend/src/lib/labels.ts`.
+4. Shifokorlar uchun 10 rang; har birining oq va qora matn bilan kontrasti hisoblansin (kamida 4.5:1).
+5. Figma'ni **view** ruxsati bilan ulash: havola PR tavsifida.
+
+**Tayyor sharti:** Nurmuhammad `tokenlar.md` dan `theme.ts` ni savolsiz yoza oladi.
+
+### 6.3 Wireframe'lar (T-11) — H2 ekranlari birinchi · 27.11
+
+Demo №1 (02.12) uchun shu tartibda:
+
+1. Kirish va parolni almashtirish (T-20).
+2. Asosiy layout — 4 rol uchun menyu (T-21).
+3. Bemorlar ro'yxati va forma (T-22).
+4. Xizmatlar va narxlar (T-23).
+5. Xodimlar (T-24).
+
+Qolganlari (taqvim, qabulga yozish, navbat, bemor kartasi, tashrif, kassa, dashboard) — 28.11 gacha. Har ekranda 4 holat: yuklanmoqda, bo'sh, xato, ma'lumot.
+
+Matnli qismlar (AI yozadi, Sanjar tekshiradi): `docs/dizayn/oqimlar.md` (5 oqim, mermaid), `docs/dizayn/ekranlar.md` (maydonlar `api.md` 3-bo'limdan, kim ko'radi — `arxitektura.md` 9-bo'lim), `docs/dizayn/matnlar.md`. PR `main`ga, reviewer: Ilyos.
+
+**Tayyor sharti:** Jahongir "qilsa bo'ladi", Ilyos "talabga mos" degan; izohlar tuzatilgan.
+
+### 6.4 T-25 · 30.11
+
+27.11 da Jahongir bilan taqvim cheklovini tekshir: `react-big-calendar` kataklari va ustunlarini o'zgartirib bo'lmaydi, faqat rang, shrift va kartochka ichi. Keyin bemor kartasi va taqvimning yakuniy ekranlari, hamma holatlari bilan (TZ, T-25).
 
 ## 7. Har ish sessiyasi oxirida
 
