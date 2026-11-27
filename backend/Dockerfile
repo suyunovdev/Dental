@@ -8,10 +8,10 @@ COPY package*.json ./
 COPY prisma.config.ts ./
 COPY prisma ./prisma
 
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 COPY . .
-RUN npm run build
+RUN npx prisma generate && npm run build
 
 FROM node:24-slim
 

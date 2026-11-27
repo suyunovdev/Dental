@@ -119,10 +119,10 @@ Serverdagi `/opt/f2/.env` fayli lokal holda saqlanadi va repoga kirmaydi:
 # Baza
 POSTGRES_USER=f2
 POSTGRES_DB=dental
-DB_PASSWORD=<kuchli-tasodifiy-parol>
+DB_PASSWORD=<openssl rand -hex 24>
 
 # JWT kaliti (openssl rand -base64 48)
-JWT_ACCESS_SECRET=<openssl-rand-base64-48>
+JWT_ACCESS_SECRET=<openssl rand -hex 32>
 
 # Dastur parametrlari
 NODE_ENV=staging
