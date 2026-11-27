@@ -28,8 +28,8 @@ Quyidagi tokenlar `ConfigProvider` ning `theme.token` obyektiga to'g'ridan-to'g'
 | AntD token nomi | Qiymat | Oq fonda kontrast | Izoh |
 | --- | --- | --- | --- |
 | `colorPrimary` | `#0F766E` | 5.47:1 | Asosiy brend rangi (zumrad-ko'k): asosiy tugmalar, faol menyu, fokus |
-| `colorPrimaryHover` | `#0D9488` | — | Tugma va havola hover holati |
-| `colorPrimaryActive` | `#115E59` | — | Tugma bosilgan (active) holati |
+| `colorPrimaryHover` | `#115E59` | 7.58:1 | Tugma va havola hover holati (oq matn bilan WCAG AA) |
+| `colorPrimaryActive` | `#134E4A` | 9.48:1 | Tugma bosilgan (active) holati |
 | `colorPrimaryBg` | `#F0FDFA` | — | Tanlangan qator va faol elementning och foni |
 | `colorSuccess` | `#15803D` | 5.02:1 | Muvaffaqiyat, yakunlangan qabul/to'lov |
 | `colorSuccessBg` | `#F0FDF4` | — | Muvaffaqiyat bildirishnomasi foni |
@@ -91,8 +91,8 @@ import type { ThemeConfig } from 'antd';
 export const getClinicTheme = (isTablet = false): ThemeConfig => ({
   token: {
     colorPrimary: '#0F766E',
-    colorPrimaryHover: '#0D9488',
-    colorPrimaryActive: '#115E59',
+    colorPrimaryHover: '#115E59',
+    colorPrimaryActive: '#134E4A',
     colorPrimaryBg: '#F0FDFA',
     colorSuccess: '#15803D',
     colorSuccessBg: '#F0FDF4',
@@ -171,7 +171,7 @@ Barcha kalitlar va o'zbekcha nomlar `arxitektura.md` (6.1-bo'lim) hamda PR #11 (
 
 | Kalit | Kod | O'zbekcha nom | Matn / aksent rangi | Fon rangi | Chegara rangi | Kontrast (`matn/fon`) |
 | --- | --- | --- | --- | --- | --- | --- |
-| `HEALTHY` | `—` *(yoki `H`)* | Sog'lom | `#374151` | `#F9FAFB` | `#D1D5DB` | 9.86:1 |
+| `HEALTHY` | `—` | Sog'lom | `#374151` | `#F9FAFB` | `#D1D5DB` | 9.86:1 |
 | `CARIES` | `C` | Karies | `#A16207` | `#FEFCE8` | `#FDE047` | 4.76:1 |
 | `FILLED` | `Pl` | Plomba | `#1D4ED8` | `#EFF6FF` | `#93C5FD` | 6.16:1 |
 | `PULPITIS` | `P` | Pulpit | `#C2410C` | `#FFF7ED` | `#FDBA74` | 4.88:1 |
