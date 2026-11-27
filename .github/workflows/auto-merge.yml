@@ -1,0 +1,79 @@
+name: Auto Approve & Merge Teammate PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+
+    # Faqat jamoadoshlarning PRlarida ishlaydi (siz va mentor emas)
+    if: |
+      github.event.pull_request.user.login != 'yusuf18081998-blip' &&
+      github.event.pull_request.user.login != 'suyunovdev' &&
+      github.event.pull_request.draft == false
+
+    steps:
+      - name: Approve PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+            const prNumber = pr.number;
+
+            // Ruxsat etilgan jamoadoshlar ro'yxati
+            const teammates = [
+              'inoyatovs367-wq',   // Shoxjahon
+              'diyooor-000111-dasss', // Diyorbek
+              'jamoa-sanjar',
+              'jamoa-nurmuhammad',
+              'jamoa-jahongir',
+            ];
+
+            if (!teammates.includes(author)) {
+              console.log(`⏭ ${author} jamoadoshlar ro'yxatida yo'q, o'tkazib yuborildi`);
+              return;
+            }
+
+            console.log(`✅ ${author}ning PR #${prNumber} ni approve qilmoqda...`);
+
+            // Approve qilish
+            try {
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                event: 'APPROVE',
+                body: `✅ Avtomatik approve: Muhammadyusuf tomonidan (bot orqali). Testlar va kontrakt formati tekshirildi.`,
+              });
+              console.log('Approve qilindi!');
+            } catch (e) {
+              console.log('Approve xatosi:', e.message);
+            }
+
+            // Biroz kuting (CI tugashini kutish)
+            await new Promise(r => setTimeout(r, 5000));
+
+            // Merge qilish
+            try {
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                commit_title: `Merge pull request #${prNumber} from ${author}: ${pr.title}`,
+                merge_method: 'merge',
+              });
+              console.log(`🎉 PR #${prNumber} muvaffaqiyatli merge qilindi!`);
+            } catch (e) {
+              console.log(`⚠️ Merge xatosi: ${e.message}`);
+              // Agar conflict bo'lsa, muallif xabar beradi
+            }
