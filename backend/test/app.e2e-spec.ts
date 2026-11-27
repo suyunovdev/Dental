@@ -1,9 +1,9 @@
 // Env o'zgaruvchilarini AppModule importidan oldin o'rnatamiz
-process.env.NODE_ENV = 'test';
-process.env.DATABASE_URL = 'postgresql://f2:f2@localhost:5432/f2';
-process.env.JWT_ACCESS_SECRET = 'test-secret-at-least-32-characters-long';
-process.env.CLINIC_NAME = 'Test Stom Clinic';
-process.env.CLINIC_PHONE = '+998901234567';
+process.env.NODE_ENV ??= 'test';
+process.env.DATABASE_URL ??= 'postgresql://f2:f2@localhost:5432/f2';
+process.env.JWT_ACCESS_SECRET ??= 'test-secret-at-least-32-characters-long';
+process.env.CLINIC_NAME ??= 'Test Stom Clinic';
+process.env.CLINIC_PHONE ??= '+998901234567';
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -44,6 +44,16 @@ describe('Health (e2e)', () => {
         expect(res.body).toHaveProperty('db', 'ok');
         expect(res.body).toHaveProperty('version');
       });
+  });
+
+  it('ketma-ket 20 health so‘rovi 200 qaytaradi', async () => {
+    for (let i = 0; i < 20; i++) {
+      await request(app.getHttpServer()).get('/api/health').expect(200);
+    }
+  });
+
+  it('tokensiz himoyalangan endpoint 401 qaytaradi', () => {
+    return request(app.getHttpServer()).get('/api/auth/me').expect(401);
   });
 
   afterEach(async () => {
