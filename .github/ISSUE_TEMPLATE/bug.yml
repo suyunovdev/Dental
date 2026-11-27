@@ -1,0 +1,81 @@
+name: Bug haqida xabar
+description: Loyihadagi xatolik haqida xabar berish
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Ogohlantirish:** Haqiqiy bemor ma'lumoti, parol va token yozmang — issue hammaga ko'rinadi.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Qisqacha tavsif
+      description: Nima xato bo'ldi?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Muhit
+      options:
+        - local
+        - staging
+        - production
+    validations:
+      required: true
+
+  - type: dropdown
+    id: role
+    attributes:
+      label: Rol
+      options:
+        - ADMIN
+        - RECEPTIONIST
+        - DOCTOR
+        - CASHIER
+        - Kirilmagan (Public)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Jiddiylik
+      options:
+        - kritik
+        - yuqori
+        - o'rta
+        - past
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Qadamlar
+      description: Xatoni takrorlash qadamlari (1, 2, 3...)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Kutilgan natija
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Haqiqiy natija
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Skrinshot yoki log
+      description: Agar bo'lsa (haqiqiy bemor ma'lumoti, parol va tokenlarsiz)
