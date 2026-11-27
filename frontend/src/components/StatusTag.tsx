@@ -39,7 +39,7 @@ export interface StatusTagProps {
 
 /**
  * Loyihadagi barcha status va turlarni yagona ko'rinishda ko'rsatuvchi Tag komponenti
- * Ranglar va o'zbekcha nomlar labels.ts dan olinadi
+ * Ranglar va o'zbekcha nomlar Sanjarning tokenlari (docs/dizayn/tokenlar.md) va labels.ts dan olinadi
  */
 export const StatusTag: React.FC<StatusTagProps> = ({
   type,
@@ -49,22 +49,28 @@ export const StatusTag: React.FC<StatusTagProps> = ({
   style,
 }) => {
   let label: string = value;
-  let color: string = 'default';
+  let textColor: string = '#4B5563';
+  let bgColor: string = '#F3F4F6';
+  let borderColor: string = '#D1D5DB';
 
   switch (type) {
     case 'appointment': {
       const meta = APPOINTMENT_STATUS_MAP[value as AppointmentStatus];
       if (meta) {
         label = meta.label;
-        color = meta.color;
+        textColor = meta.textColor || meta.color;
+        bgColor = meta.bgColor;
+        borderColor = meta.borderColor;
       }
       break;
     }
     case 'tooth': {
       const meta = TOOTH_STATUS_MAP[value as ToothStatus];
       if (meta) {
-        label = showCode ? `${meta.code} · ${meta.label}` : meta.label;
-        color = meta.color;
+        label = showCode && meta.code !== '—' ? `${meta.code} · ${meta.label}` : meta.label;
+        textColor = meta.textColor || meta.color;
+        bgColor = meta.bgColor;
+        borderColor = meta.borderColor;
       }
       break;
     }
@@ -72,7 +78,9 @@ export const StatusTag: React.FC<StatusTagProps> = ({
       const meta = VISIT_STATUS_MAP[value as VisitStatus];
       if (meta) {
         label = meta.label;
-        color = meta.color;
+        textColor = meta.textColor || meta.color;
+        bgColor = meta.bgColor;
+        borderColor = meta.borderColor;
       }
       break;
     }
@@ -80,7 +88,9 @@ export const StatusTag: React.FC<StatusTagProps> = ({
       const meta = PLAN_STATUS_MAP[value as PlanStatus];
       if (meta) {
         label = meta.label;
-        color = meta.color;
+        textColor = meta.textColor || meta.color;
+        bgColor = meta.bgColor;
+        borderColor = meta.borderColor;
       }
       break;
     }
@@ -88,7 +98,9 @@ export const StatusTag: React.FC<StatusTagProps> = ({
       const meta = PLAN_ITEM_STATUS_MAP[value as PlanItemStatus];
       if (meta) {
         label = meta.label;
-        color = meta.color;
+        textColor = meta.textColor || meta.color;
+        bgColor = meta.bgColor;
+        borderColor = meta.borderColor;
       }
       break;
     }
@@ -96,7 +108,9 @@ export const StatusTag: React.FC<StatusTagProps> = ({
       const meta = PAYMENT_TYPE_MAP[value as PaymentType];
       if (meta) {
         label = meta.label;
-        color = meta.color;
+        textColor = meta.textColor || meta.color;
+        bgColor = meta.bgColor;
+        borderColor = meta.borderColor;
       }
       break;
     }
@@ -104,7 +118,9 @@ export const StatusTag: React.FC<StatusTagProps> = ({
       const meta = PAYMENT_METHOD_MAP[value as PaymentMethod];
       if (meta) {
         label = meta.label;
-        color = 'blue';
+        textColor = meta.textColor || meta.color;
+        bgColor = meta.bgColor;
+        borderColor = meta.borderColor;
       }
       break;
     }
@@ -112,14 +128,26 @@ export const StatusTag: React.FC<StatusTagProps> = ({
       const meta = ROLE_MAP[value as Role];
       if (meta) {
         label = meta.label;
-        color = value === 'ADMIN' ? 'red' : value === 'DOCTOR' ? 'green' : value === 'CASHIER' ? 'gold' : 'blue';
+        textColor = meta.textColor || meta.color;
+        bgColor = meta.bgColor;
+        borderColor = meta.borderColor;
       }
       break;
     }
   }
 
   return (
-    <Tag color={color} className={className} style={{ borderRadius: 6, ...style }}>
+    <Tag
+      className={className}
+      style={{
+        borderRadius: 4,
+        color: textColor,
+        backgroundColor: bgColor,
+        borderColor: borderColor,
+        fontWeight: 500,
+        ...style,
+      }}
+    >
       {label}
     </Tag>
   );

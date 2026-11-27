@@ -1,66 +1,98 @@
 import type { ThemeConfig } from 'antd';
 
 /**
- * Dental platformasi (F-2) — Ant Design 6 temasi va Sanjar UI kit tokenlari
- * Arxitektura talabi: arxitektura.md 5-bo'lim va TZ T-13 1-band
+ * Dental platformasi (F-2) — Ant Design 6 temasi va Sanjarning dizayn tokenlari
+ * Arxitektura va dizayn talabi:
+ * - docs/dizayn/tokenlar.md (T-12, PR #18)
+ * - Mentor tavsiyasi: colorPrimaryHover uchun #115E59 (7.58:1) va colorPrimaryActive uchun #134E4A (9.48:1)
+ *   (WCAG AA kamida 4.5:1 kontrast mezoniga to'liq mos kelish uchun)
  */
-export const theme: ThemeConfig = {
+export const getClinicTheme = (isTablet = false): ThemeConfig => ({
   token: {
-    // Asosiy brend ranglari (stomatologiya klinikasi uchun tibbiy ko'k/feruza)
-    colorPrimary: '#0ea5e9',
-    colorSuccess: '#10b981',
-    colorWarning: '#f59e0b',
-    colorError: '#ef4444',
-    colorInfo: '#0ea5e9',
+    // 2.1 Asosiy va semantik ranglar (medical teal brendi)
+    colorPrimary: '#0F766E',
+    colorPrimaryHover: '#115E59',
+    colorPrimaryActive: '#134E4A',
+    colorPrimaryBg: '#F0FDFA',
+    colorSuccess: '#15803D',
+    colorSuccessBg: '#F0FDF4',
+    colorWarning: '#B45309',
+    colorWarningBg: '#FFFBEB',
+    colorError: '#DC2626',
+    colorErrorBg: '#FEF2F2',
+    colorInfo: '#0369A1',
+    colorInfoBg: '#F0F9FF',
 
-    // Tipografika va shriftlar
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    // 2.2 Neytral ranglar (matn, chegara, fon)
+    colorText: '#111827',
+    colorTextSecondary: '#4B5563',
+    colorTextTertiary: '#6B7280',
+    colorTextDisabled: '#9CA3AF',
+    colorBorder: '#D1D5DB',
+    colorBorderSecondary: '#E5E7EB',
+    colorBgLayout: '#F8FAFC',
+    colorBgContainer: '#FFFFFF',
+    colorBgElevated: '#FFFFFF',
+    colorFillAlter: '#F9FAFB',
+
+    // 2.3 Tipografiya, o'lcham va bo'shliqlar
+    fontFamily:
+      "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
     fontSize: 14,
-    fontSizeHeading1: 28,
+    fontSizeSM: 12,
+    fontSizeLG: 16,
+    fontSizeHeading1: 30,
     fontSizeHeading2: 24,
     fontSizeHeading3: 20,
     fontSizeHeading4: 16,
 
-    // Geometriya va o'lchamlar
-    borderRadius: 8,
-    controlHeight: 38,
-    controlHeightLG: 44,
-    controlHeightSM: 32,
-
-    // Fon va chegaralar
-    colorBgContainer: '#ffffff',
-    colorBorder: '#e2e8f0',
-    colorBorderSecondary: '#f1f5f9',
+    borderRadius: 6,
+    borderRadiusSM: 4,
+    borderRadiusLG: 8,
+    controlHeight: isTablet ? 40 : 32,
+    controlHeightLG: 40,
+    controlHeightSM: 24,
+    wireframe: false,
   },
   components: {
-    Button: {
-      borderRadius: 8,
-      controlHeight: 38,
-      fontWeight: 500,
+    Layout: {
+      siderBg: '#FFFFFF',
+      headerBg: '#FFFFFF',
+      bodyBg: '#F8FAFC',
+    },
+    Menu: {
+      itemSelectedBg: '#F0FDFA',
+      itemSelectedColor: '#0F766E',
     },
     Table: {
-      headerBg: '#f8fafc',
-      headerColor: '#1e293b',
-      borderRadius: 8,
-      rowHoverBg: '#f1f5f9',
+      headerBg: '#F9FAFB',
+      headerColor: '#4B5563',
+      borderColor: '#E5E7EB',
     },
     Card: {
-      borderRadiusLG: 12,
+      borderRadiusLG: 8,
     },
     Modal: {
-      borderRadiusLG: 12,
-      headerBg: '#ffffff',
+      borderRadiusLG: 8,
+      headerBg: '#FFFFFF',
+    },
+    Button: {
+      borderRadius: 6,
+      controlHeight: isTablet ? 40 : 32,
+      fontWeight: 500,
     },
     Input: {
-      borderRadius: 8,
-      controlHeight: 38,
+      borderRadius: 6,
+      controlHeight: isTablet ? 40 : 32,
     },
     Select: {
-      borderRadius: 8,
-      controlHeight: 38,
+      borderRadius: 6,
+      controlHeight: isTablet ? 40 : 32,
     },
     Tag: {
-      borderRadiusSM: 6,
+      borderRadiusSM: 4,
     },
   },
-};
+});
+
+export const theme: ThemeConfig = getClinicTheme();
