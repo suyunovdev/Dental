@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import pg from 'pg';
+import bcrypt from 'bcryptjs';
+import { fakerUZ_UZ_latin as faker } from '@faker-js/faker';
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
   PrismaClient,
@@ -12,15 +14,31 @@ import {
   PaymentMethod,
 } from '../src/generated/prisma/client.js';
 
+if (process.env.NODE_ENV === 'production') {
+  throw new Error("Production muhitida seed ishga tushirilmaydi");
+}
+
 const connectionString = process.env.DATABASE_URL;
 const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-// bcrypt hash for 'Admin123!' (cost 12)
-const DEFAULT_PASSWORD_HASH = '$2b$12$e80yqXFvL8fFjI1Vp/t4e.o1W0gWw0O4pZ4M4M.W6K0F0A4U7T.3u';
+function seedPassword(name: string): string {
+  const value = process.env[name];
+  if (!value || value.length < 8) {
+    throw new Error(`${name} kamida 8 belgidan iborat bo'lishi kerak`);
+  }
+  return value;
+}
 
 async function main() {
+  const passwordHashes = {
+    admin: await bcrypt.hash(seedPassword('SEED_ADMIN_PASSWORD'), 12),
+    receptionist: await bcrypt.hash(seedPassword('SEED_RECEPTIONIST_PASSWORD'), 12),
+    cashier: await bcrypt.hash(seedPassword('SEED_CASHIER_PASSWORD'), 12),
+    doctor: await bcrypt.hash(seedPassword('SEED_DOCTOR_PASSWORD'), 12),
+  };
+  faker.seed(2026);
   console.log('--- Seeding boshlandi ---');
 
   // Tozalash (teskari tartibda)
@@ -46,7 +64,7 @@ async function main() {
     data: {
       fullName: 'Adminbek Rahbarov',
       username: (process.env.SEED_ADMIN_USERNAME || 'admin').toLowerCase(),
-      passwordHash: DEFAULT_PASSWORD_HASH,
+      passwordHash: passwordHashes.admin,
       phone: '+998901000001',
       roles: [Role.ADMIN],
       isActive: true,
@@ -58,7 +76,7 @@ async function main() {
     data: {
       fullName: 'Munira Registratorova',
       username: 'receptionist',
-      passwordHash: DEFAULT_PASSWORD_HASH,
+      passwordHash: passwordHashes.receptionist,
       phone: '+998901000002',
       roles: [Role.RECEPTIONIST],
       isActive: true,
@@ -70,7 +88,7 @@ async function main() {
     data: {
       fullName: 'Kamola Kassirova',
       username: 'cashier',
-      passwordHash: DEFAULT_PASSWORD_HASH,
+      passwordHash: passwordHashes.cashier,
       phone: '+998901000003',
       roles: [Role.CASHIER],
       isActive: true,
@@ -83,7 +101,7 @@ async function main() {
     data: {
       fullName: 'Dr. Jasur Aliyev',
       username: 'dr_jasur',
-      passwordHash: DEFAULT_PASSWORD_HASH,
+      passwordHash: passwordHashes.doctor,
       phone: '+998901000011',
       roles: [Role.DOCTOR],
       specialty: 'Terapevt',
@@ -98,7 +116,7 @@ async function main() {
     data: {
       fullName: 'Dr. Nodira Karimova',
       username: 'dr_nodira',
-      passwordHash: DEFAULT_PASSWORD_HASH,
+      passwordHash: passwordHashes.doctor,
       phone: '+998901000012',
       roles: [Role.DOCTOR],
       specialty: 'Ortoped',
@@ -113,7 +131,7 @@ async function main() {
     data: {
       fullName: 'Dr. Bobur Umidov',
       username: 'dr_bobur',
-      passwordHash: DEFAULT_PASSWORD_HASH,
+      passwordHash: passwordHashes.doctor,
       phone: '+998901000013',
       roles: [Role.DOCTOR],
       specialty: 'Jarroh',
@@ -244,16 +262,10 @@ async function main() {
   const patients = [mother, child];
 
   // Qolgan 48 bemor
-  const uzbekFirstNamesM = ['Anvar', 'Bekzod', 'Doston', 'Elbek', 'Farhod', 'G\'ayrat', 'Humoyun', 'Ilyos', 'Javohir', 'Kamron', 'Mansur', 'Nodir', 'Otabek', 'Po\'lat', 'Qodir', 'Rustam', 'Sanjar', 'Temur', 'Ulug\'bek', 'Vali', 'Xurshid', 'Yodgor', 'Zafar', 'Akmal'];
-  const uzbekFirstNamesF = ['Aziza', 'Barno', 'Charos', 'Dildora', 'Feruza', 'Gulnoza', 'Hilola', 'Iroda', 'Kamola', 'Lola', 'Madina', 'Nargiza', 'Oydin', 'Parvina', 'Ra\'no', 'Sevara', 'Umida', 'Vazira', 'Yulduz', 'Zilola', 'Shahnoza', 'Malika', 'Nigora', 'Zuhra'];
-  const uzbekLastNames = ['Karimov', 'Rahimov', 'Aliyev', 'Tursunov', 'Umarov', 'Sodiqov', 'Ergashev', 'Mirzayev', 'Qosimov', 'Shamsiyev', 'Yusupov', 'Rasulov', 'Bekmurodov', 'Xoliqov', 'Nazarov', 'Boboyev'];
-
   for (let i = 0; i < 48; i++) {
     const isMale = i % 2 === 0;
-    const fNames = isMale ? uzbekFirstNamesM : uzbekFirstNamesF;
-    const firstName = fNames[i % fNames.length];
-    const baseLastName = uzbekLastNames[i % uzbekLastNames.length];
-    const lastName = isMale ? baseLastName : `${baseLastName}a`;
+    const firstName = faker.person.firstName(isMale ? 'male' : 'female');
+    const lastName = faker.person.lastName(isMale ? 'male' : 'female');
     const phoneNum = (900000000 + (i + 100) * 137).toString().slice(0, 7);
     const phone = `+99890${phoneNum}`;
 
